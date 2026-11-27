@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRML Project: Human Activity Recognition | 12-Slide Deck</title>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-blue: #38bdf8;
+            --accent-green: #4ade80;
+            --accent-orange: #fb923c;
+            --accent-purple: #c084fc;
+            --border-color: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 100;
+            display: flex;
+            gap: 12px;
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(8px);
+            padding: 8px 16px;
+            border-radius: 9999px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .controls button {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 9999px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .controls button:hover {
+            background: var(--accent-blue);
+            color: var(--bg-primary);
+        }
+
+        .slide-counter {
+            align-self: center;
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .slide-container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 40px 20px 100px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .slide {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 48px;
+            min-height: 680px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            position: relative;
+            page-break-after: always;
+        }
+
+        .slide-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 28px;
+        }
+
+        .slide-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        .slide-tag {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: #334155;
+            padding: 4px 12px;
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-weight: 700;
+        }
+
+        .slide-body {
+            flex-grow: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .slide-body.full-width {
+            grid-template-columns: 1fr;
+        }
+
+        .content-box {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .content-box h3 {
+            color: var(--accent-green);
+            font-size: 20px;
+        }
+
+        .content-box ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .content-box li {
+            position: relative;
+            padding-left: 24px;
+            line-height: 1.6;
+            color: #cbd5e1;
+            font-size: 16px;
+        }
+
+        .content-box li::before {
+            content: "▹";
+            position: absolute;
+            left: 0;
+            color: var(--accent-blue);
+            font-weight: bold;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 12px;
+        }
+
+        .stat-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--accent-blue);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            text-transform: uppercase;
+        }
+
+        .image-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            overflow: hidden;
+        }
+
+        .image-box img {
+            max-width: 100%;
+            max-height: 380px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .image-caption {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin-top: 12px;
+        }
+
+        th, td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: rgba(51, 65, 85, 0.5);
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        .badge-green {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--accent-green);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .slide-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-color);
+            padding-top: 16px;
+            margin-top: 24px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            .controls {
+                display: none;
+            }
+            .slide-container {
+                padding: 0;
+                max-width: 100%;
+            }
+            .slide {
+                background: white;
+                color: black;
+                border: none;
+                box-shadow: none;
+                height: 100vh;
+                margin: 0;
+                page-break-after: always;
+            }
+            .slide-title {
+                color: #0284c7;
+            }
+            .stat-card {
+                background: #f1f5f9;
+                border: 1px solid #cbd5e1;
+            }
+            .stat-val {
+                color: #0284c7;
+            }
+            th {
+                background: #f1f5f9;
+                color: #0284c7;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <button onclick="window.print()">🖨️ Save as PDF</button>
+        <button onclick="scrollSlide(-1)">◀ Prev</button>
+        <span class="slide-counter" id="counter">Slide 1 of 12</span>
+        <button onclick="scrollSlide(1)">Next ▶</button>
+    </div>
+
+    <div class="slide-container">
+
+        <!-- Slide 1: Title & Problem Statement -->
+        <section class="slide" id="slide-1">
+            <div class="slide-header">
+                <div>
+                    <h1 class="slide-title">Human Activity Recognition with Smartphones</h1>
+                    <p style="color: var(--text-secondary); margin-top: 6px;">PRML End-Semester Capstone Project</p>
+                </div>
+                <span class="slide-tag">Slide 01 / 12</span>
+            </div>
+            <div class="slide-body">
+                <div class="content-box">
+                    <h3>🎯 Problem Statement</h3>
+                    <ul>
+                        <li><strong>Core Task:</strong> Multiclass classification of 6 daily human physical activities using smartphone triaxial accelerometer & gyroscope sensor streams.</li>
+                        <li><strong>Analytical Goal:</strong> Evaluate and compare high-dimensional classification performance across baseline features (561), feature selection (ANOVA), and unsupervised compression (PCA).</li>
+                        <li><strong>Engineering Pipeline:</strong> End-to-end reproducible machine learning architecture from raw sensor data to voting ensemble deployment.</li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <div class="stat-grid">
+                        <div class="stat-card">
+                            <div class="stat-val">10,299</div>
+                            <div class="stat-label">Total Observations</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-val">561</div>
+                            <div class="stat-label">Sensor Features</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-val">6</div>
+                            <div class="stat-label">Activity Classes</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-val">96.8%</div>
+                            <div class="stat-label">Champion Accuracy</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Team: Rudransh Mishra (25AI1019) | Sahitya Panwar (25AI1042) | Gulshan Kumar Shah (25AI1019)</span>
+                <span>PRML Course Evaluation</span>
+            </div>
+        </section>
+
+        <!-- Slide 2: Motivation -->
+        <section class="slide" id="slide-2">
+            <div class="slide-header">
+                <h2 class="slide-title">Motivation & Theoretical Foundation</h2>
+                <span class="slide-tag">Slide 02 / 12</span>
+            </div>
+            <div class="slide-body">
+                <div class="content-box">
+                    <h3>💡 Practical & Theoretical Drivers</h3>
+                    <ul>
+                        <li><strong>Pervasive Healthcare:</strong> Continuous biometric monitoring for elderly care, fall detection, and ambulatory rehabilitation without intrusive hardware.</li>
+                        <li><strong>Curse of Dimensionality:</strong> Managing 561 collinear sensor attributes requiring dimensionality reduction to prevent overfitting.</li>
+                        <li><strong>Bias-Variance Tradeoff:</strong> Comparing low-complexity models (Naive Bayes) vs margin maximizers (SVM) vs variance-reducing ensembles (Voting).</li>
+                        <li><strong>Syllabus Integration:</strong> Demonstrates practical implementation of Kernel Tricks, Gini Splitting, Distance-weighted KNN, PCA, and Density Clustering.</li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <div class="stat-card" style="text-align: left; padding: 24px;">
+                        <h4 style="color: var(--accent-orange); margin-bottom: 12px;">Key Syllabus Topics Tested:</h4>
+                        <ul style="font-size: 14px;">
+                            <li>Naive Bayes (Gaussian conditional likelihood)</li>
+                            <li>SVM (RBF Kernel & Margin Maximization)</li>
+                            <li>Decision Trees & Random Forest Bagging</li>
+                            <li>KNN & Distance-Weighted Nearest Neighbors</li>
+                            <li>AdaBoost (Sequential Boosting)</li>
+                            <li>K-Means & DBSCAN (Cluster Validity)</li>
+                            <li>PCA (Eigenvalue Variance Retention)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Pattern Recognition & Machine Learning</span>
+                <span>Slide 2</span>
+            </div>
+        </section>
+
+        <!-- Slide 3: Dataset -->
+        <section class="slide" id="slide-3">
+            <div class="slide-header">
+                <h2 class="slide-title">Dataset Anatomy: UCI HAR</h2>
+                <span class="slide-tag">Slide 03 / 12</span>
+            </div>
+            <div class="slide-body">
+                <div class="content-box">
+                    <h3>📊 Dataset Profiling</h3>
+                    <table>
+                        <tr><th>Dimension</th><th>Training Partition</th><th>Test Partition</th></tr>
+                        <tr><td>Observations</td><td>7,352 (71.4%)</td><td>2,947 (28.6%)</td></tr>
+                        <tr><td>Engineered Features</td><td>561</td><td>561</td></tr>
+                        <tr><td>Missing / Null</td><td>0 (Pristine)</td><td>0 (Pristine)</td></tr>
+                        <tr><td>Values Range</td><td>[-1.0, +1.0]</td><td>[-1.0, +1.0]</td></tr>
+                    </table>
+                    <ul style="margin-top: 16px;">
+                        <li><strong>Target Activities:</strong> Walking, Upstairs, Downstairs, Sitting, Standing, Laying.</li>
+                        <li><strong>Sensor Signals:</strong> Triaxial acceleration & angular velocity captured at 50Hz, filtered into Body and Gravity components.</li>
+                    </ul>
+                </div>
+                <div class="image-box">
+                    <img src="01_class_distribution.png" alt="Class Distribution">
+                    <div class="image-caption">Figure 1: Balanced Class Distribution Across Partitions</div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>UCI Machine Learning Repository Benchmark</span>
+                <span>Slide 3</span>
+            </div>
+        </section>
+
+        <!-- Slide 4: Unsupervised & Feature Engineering -->
+        <section class="slide" id="slide-4">
+            <div class="slide-header">
+                <h2 class="slide-title">Unsupervised Cluster Discovery</h2>
+                <span class="slide-tag">Slide 04 / 12</span>
+            </div>
+            <div class="slide-body">
+                <div class="content-box">
+                    <h3>🔬 K-Means & DBSCAN Analysis</h3>
+                    <ul>
+                        <li><strong>K-Means Optimization:</strong> Swept $k \in [2, 10]$. Elbow Method inflection and Silhouette Coefficient peaked at $k=6$, perfectly matching the ground-truth physical activity categories.</li>
+                        <li><strong>Clustering Fidelity:</strong>
+                            <ul>
+                                <li>Adjusted Rand Index (ARI): <strong>0.448</strong></li>
+                                <li>Normalized Mutual Information (NMI): <strong>0.562</strong></li>
+                            </ul>
+                        </li>
+                        <li><strong>DBSCAN Epsilon Calibration:</strong> Knee point in 5-NN distance curve identified optimal density radius ($\varepsilon = 15.0$, `min_samples` = 5).</li>
+                    </ul>
+                </div>
+                <div class="image-box">
+                    <img src="08_clustering_comparison.png" alt="Clustering Comparison">
+                    <div class="image-caption">Figure 2: Ground Truth vs K-Means vs DBSCAN in 2D Latent Space</div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Unsupervised Pattern Discovery</span>
+                <span>Slide 4</span>
+            </div>
+        </section>
+
+        <!-- Slide 5: Approaches - Evaluation & Ensembles -->
+        <section class="slide" id="slide-5">
+            <div class="slide-header">
+                <h2 class="slide-title">Evaluation Strategy & Ensemble Design</h2>
+                <span class="slide-tag">Slide 05 / 12</span>
+            </div>
+            <div class="slide-body">
+                <div class="content-box">
+                    <h3>🛡️ Rigorous Validation Protocol</h3>
+                    <ul>
+                        <li><strong>Stratified 5-Fold Cross-Validation:</strong> Preserves uniform class representation across all training folds to eliminate validation sampling bias.</li>
+                        <li><strong>Evaluation Metrics:</strong> Accuracy, Macro Precision, Macro Recall, and Macro F1-Score (unweighted average across all 6 classes).</li>
+                        <li><strong>Ensemble Architecture:</strong>
+                            <ul>
+                                <li><strong>Hard Voting:</strong> Plurality majority vote across estimators: $\hat{y} = \text{mode}\{C_1(x), \dots, C_m(x)\}$.</li>
+                                <li><strong>Soft Voting:</strong> Sum of predicted posterior probabilities: $\hat{y} = \arg\max \sum p_i(y|x)$.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="image-box">
+                    <img src="06_kmeans_elbow_silhouette.png" alt="K-Means Diagnostics">
+                    <div class="image-caption">Figure 3: Elbow Sum of Squares & Silhouette Coefficient Diagnostics</div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Validation Strategy & Ensemble Theory</span>
+                <span>Slide 5</span>
+            </div>
+        </section>
+
+        <!-- Slide 6: Complete Pipeline -->
+        <section class="slide" id="slide-6">
+            <div class="slide-header">
+                <h2 class="slide-title">End-to-End System Pipeline</h2>
+                <span class="slide-tag">Slide 06 / 12</span>
+            </div>
+            <div class="slide-body full-width">
+                <div class="content-box">
+                    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-top: 20px;">
+                        <div class="stat-card" style="border-top: 4px solid var(--accent-blue);">
+                            <div style="font-size: 24px; margin-bottom: 8px;">📥</div>
+                            <h4 style="color: var(--accent-blue);">1. Ingestion & EDA</h4>
+                            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 8px;">Load 10,299 instances, audit missing values, map 561 sensor axes.</p>
+                        </div>
+                        <div class="stat-card" style="border-top: 4px solid var(--accent-green);">
+                            <div style="font-size: 24px; margin-bottom: 8px;">🔬</div>
+                            <h4 style="color: var(--accent-green);">2. Clustering</h4>
+                            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 8px;">K-Means ($k=6$) & DBSCAN isolation of noise and natural partitions.</p>
+                        </div>
+                        <div class="stat-card" style="border-top: 4px solid var(--accent-orange);">
+                            <div style="font-size: 24px; margin-bottom: 8px;">📐</div>
+                            <h4 style="color: var(--accent-orange);">3. Compression</h4>
+                            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 8px;">SelectKBest (ANOVA) vs PCA (95% variance) dimension reduction.</p>
+                        </div>
+                        <div class="stat-card" style="border-top: 4px solid var(--accent-purple);">
+                            <div style="font-size: 24px; margin-bottom: 8px;">⚙️</div>
+                            <h4 style="color: var(--accent-purple);">4. Benchmarking</h4>
+                            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 8px;">11 algorithms trained with Stratified 5-Fold cross validation.</p>
+                        </div>
+                        <div class="stat-card" style="border-top: 4px solid #f43f5e;">
+                            <div style="font-size: 24px; margin-bottom: 8px;">🚀</div>
+                            <h4 style="color: #f43f5e;">5. Deployment</h4>
+                            <p style="font-size: 13px; color: var(--text-secondary); margin-top: 8px;">Champion voting ensemble served via interactive Streamlit console.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Architectural Overview</span>
+                <span>Slide 6</span>
+            </div>
+        </section>
+
+        <!-- Slide 7: Experimental Results - Feature Impact -->
+        <section class="slide" id="slide-7">
+            <div class="slide-header">
+                <h2 class="slide-title">Experimental Results: Dimensionality Trade-Off</h2>
+                <span class="slide-tag">Slide 07 / 12</span>
+            </div>
+            <div class="slide-body">
+                <div class="content-box">
+                    <h3>📉 Compression vs Accuracy</h3>
+                    <table>
+                        <tr><th>Configuration</th><th>Feature Count</th><th>Cross-Val Acc</th><th>Compression</th></tr>
+                        <tr><td>Baseline Full Space</td><td>561 Features</td><td>96.25%</td><td>0% (Base)</td></tr>
+                        <tr><td>SelectKBest (ANOVA)</td><td>100 Features</td><td>95.80%</td><td><span class="badge-green">82.2% Reduction</span></td></tr>
+                        <tr><td>PCA (95% Variance)</td><td>102 Components</td><td>95.40%</td><td><span class="badge-green">81.8% Reduction</span></td></tr>
+                    </table>
+                    <ul style="margin-top: 16px;">
+                        <li><strong>Key Insight:</strong> 82% of sensor features can be eliminated with only a <strong>0.45%</strong> impact on predictive accuracy.</li>
+                        <li><strong>Speedup:</strong> Reduced training and inference time by ~4.8×, enabling real-time edge smartphone deployment.</li>
+                    </ul>
+                </div>
+                <div class="image-box">
+                    <img src="12_feature_selection_vs_pca.png" alt="Dimensionality Reduction Comparison">
+                    <div class="image-caption">Figure 4: Full Features vs Filter Feature Selection vs PCA</div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Dimensionality Reduction Analysis</span>
+                <span>Slide 7</span>
+            </div>
+        </section>
+
+        <!-- Slide 8: Experimental Results - CV & Ensembles -->
+        <section class="slide" id="slide-8">
+            <div class="slide-header">
+                <h2 class="slide-title">Experimental Results: Test Benchmark & Ensembles</h2>
+                <span class="slide-tag">Slide 08 / 12</span>
+            </div>
+            <div class="slide-body">
+                <div class="content-box">
+                    <h3>🏆 Final Test Benchmark (2,947 Unseen Samples)</h3>
+                    <table>
+                        <tr><th>Model Architecture</th><th>Test Accuracy</th><th>Macro F1</th></tr>
+                        <tr><td><strong>Soft Voting Ensemble</strong></td><td><span class="badge-green"><strong>96.84%</strong></span></td><td><strong>96.88%</strong></td></tr>
+                        <tr><td>Hard Voting Ensemble</td><td>96.71%</td><td>96.75%</td></tr>
+                        <tr><td>SVM (RBF Kernel, C=10)</td><td>96.54%</td><td>96.59%</td></tr>
+                        <tr><td>Random Forest (100 Trees)</td><td>92.84%</td><td>92.81%</td></tr>
+                        <tr><td>Weighted KNN (k=5)</td><td>90.74%</td><td>90.62%</td></tr>
+                        <tr><td>AdaBoost (SAMME.R)</td><td>53.38%</td><td>53.11%</td></tr>
+                    </table>
+                </div>
+                <div class="image-box">
+                    <img src="13_final_ensemble_benchmark.png" alt="Ensemble Benchmark">
+                    <div class="image-caption">Figure 5: Champion Ensemble vs Base Estimators</div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Holdout Test Set Generalization</span>
+                <span>Slide 8</span>
+            </div>
+        </section>
+
+        <!-- Slide 9: Challenges -->
+        <section class="slide" id="slide-9">
+            <div class="slide-header">
+                <h2 class="slide-title">Engineering Challenges Overcome</h2>
+                <span class="slide-tag">Slide 09 / 12</span>
+            </div>
+            <div class="slide-body">
+                <div class="content-box">
+                    <h3>🚧 Key Obstacles & Solutions</h3>
+                    <ul>
+                        <li><strong>Multicollinearity in Sensor Data:</strong> Accelerometer and gyroscope axes generated extensive pairwise correlations ($r > 0.90$). Resolved using orthogonal PCA projection and ANOVA ranking.</li>
+                        <li><strong>DBSCAN in High Dimensions:</strong> Euclidean metric suffers distance concentration in 561-D space. Tuned via $k$-distance sorting and calibrated neighborhood radius ($\varepsilon = 15.0$).</li>
+                        <li><strong>Static Posture Ambiguity:</strong> Distinguishing Sitting vs Standing is challenging because gravity alignment is identical. Resolved via non-linear SVM RBF kernel margin mapping.</li>
+                        <li><strong>Memory Overhead:</strong> Training sets with 561 features across multiple folds caused memory spikes; solved via chunked cross-validation and standardized scaling.</li>
+                    </ul>
+                </div>
+                <div class="image-box">
+                    <img src="14_champion_confusion_matrix.png" alt="Champion Confusion Matrix">
+                    <div class="image-caption">Figure 6: Champion Confusion Matrix — Demonstrates Sharp Diagonal Discrimination</div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Technical Problem Solving</span>
+                <span>Slide 9</span>
+            </div>
+        </section>
+
+        <!-- Slide 10: Learnings -->
+        <section class="slide" id="slide-10">
+            <div class="slide-header">
+                <h2 class="slide-title">Major PRML Learnings & Conclusions</h2>
+                <span class="slide-tag">Slide 10 / 12</span>
+            </div>
+            <div class="slide-body full-width">
+                <div class="content-box">
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                        <div class="stat-card" style="text-align: left;">
+                            <h4 style="color: var(--accent-blue); margin-bottom: 8px;">1. Kernel Power</h4>
+                            <p style="font-size: 14px; line-height: 1.6; color: var(--text-secondary);">
+                                SVM with RBF Kernel dramatically outperforms linear baselines (96.5% vs 78%), confirming the non-linear manifold geometry of triaxial sensor dynamics.
+                            </p>
+                        </div>
+                        <div class="stat-card" style="text-align: left;">
+                            <h4 style="color: var(--accent-green); margin-bottom: 8px;">2. Ensemble Variance Reduction</h4>
+                            <p style="font-size: 14px; line-height: 1.6; color: var(--text-secondary);">
+                                Soft Voting aggregates diverse probabilistic estimates, successfully recovering misclassified edge samples and establishing the highest F1-Score of 96.88%.
+                            </p>
+                        </div>
+                        <div class="stat-card" style="text-align: left;">
+                            <h4 style="color: var(--accent-orange); margin-bottom: 8px;">3. Compression Efficiency</h4>
+                            <p style="font-size: 14px; line-height: 1.6; color: var(--text-secondary);">
+                                Filter selection (100 features) preserves predictive utility while discarding 82% of data bandwidth, demonstrating feasibility for low-power mobile wearables.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Theoretical & Empirical Insights</span>
+                <span>Slide 10</span>
+            </div>
+        </section>
+
+        <!-- Slide 11: Live Demo & Repository -->
+        <section class="slide" id="slide-11">
+            <div class="slide-header">
+                <h2 class="slide-title">Live Demonstration & Open Repository</h2>
+                <span class="slide-tag">Slide 11 / 12</span>
+            </div>
+            <div class="slide-body">
+                <div class="content-box">
+                    <h3>💻 Interactive Deployment & Source Code</h3>
+                    <ul>
+                        <li><strong>Public GitHub Repository:</strong> Complete source code, notebooks, and models versioned publicly.</li>
+                        <li><strong>Live Streamlit Console:</strong> Interactive activity prediction interface allowing real-time inspection of test observations.</li>
+                        <li><strong>Reproducibility:</strong> Automated data retrieval via <code>download_data.py</code> directly from the UCI archive.</li>
+                    </ul>
+                    <div class="stat-card" style="margin-top: 16px; text-align: left;">
+                        <div style="font-size: 13px; color: var(--accent-blue); font-weight: 700;">GitHub Repository URL:</div>
+                        <div style="font-family: monospace; font-size: 15px; margin-top: 4px; color: var(--text-primary);">
+                            https://github.com/thisisgulshanshah/prml-human-activity-recognition
+                        </div>
+                    </div>
+                </div>
+                <div class="image-box">
+                    <img src="04_pca_latent_space.png" alt="PCA Latent Space">
+                    <div class="image-caption">Figure 7: High-Dimensional Sensor Projection into Latent Manifold</div>
+                </div>
+            </div>
+            <div class="slide-footer">
+                <span>Deliverables & Code Assets</span>
+                <span>Slide 11</span>
+            </div>
+        </section>
+
+        <!-- Slide 12: Thank You -->
+        <section class="slide" id="slide-12" style="text-align: center; justify-content: center; align-items: center;">
+            <div style="max-width: 600px; display: flex; flex-direction: column; align-items: center; gap: 20px;">
+                <div style="font-size: 54px;">🎓</div>
+                <h1 style="font-size: 38px; color: var(--accent-blue);">Thank You!</h1>
+                <p style="font-size: 18px; color: var(--text-secondary);">
+                    Pattern Recognition & Machine Learning (PRML) Project Presentation
+                </p>
+                <div style="background: rgba(30, 41, 59, 0.8); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px 32px; width: 100%;">
+                    <p style="font-weight: 700; color: var(--accent-blue); font-size: 16px; margin-bottom: 8px;">PROJECT TEAM MEMBERS</p>
+                    <p style="font-weight: 600; color: var(--text-primary); font-size: 16px;">• Rudransh Mishra (25AI1019)</p>
+                    <p style="font-weight: 600; color: var(--text-primary); font-size: 16px;">• Sahitya Panwar (25AI1042)</p>
+                    <p style="font-weight: 600; color: var(--text-primary); font-size: 16px;">• Gulshan Kumar Shah (25AI1019)</p>
+                    <p style="color: var(--text-secondary); margin-top: 8px; font-size: 14px;">B.Tech AI & Data Science | Semester 3</p>
+                    <p style="color: var(--accent-green); margin-top: 4px; font-weight: 600;">Gati Shakti Vishwavidyalaya, Vadodara</p>
+                </div>
+                <p style="color: var(--accent-orange); font-weight: 600; margin-top: 12px;">Questions & Discussion Welcome</p>
+            </div>
+            <div class="slide-footer" style="width: 100%; position: absolute; bottom: 24px; left: 0; padding: 0 48px;">
+                <span>PRML Capstone Complete</span>
+                <span>Slide 12 / 12</span>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 12;
+
+        function updateCounter() {
+            document.getElementById('counter').innerText = `Slide ${currentSlide} of ${totalSlides}`;
+        }
+
+        function scrollSlide(dir) {
+            currentSlide = Math.min(Math.max(1, currentSlide + dir), totalSlides);
+            const el = document.getElementById(`slide-${currentSlide}`);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+            }
+            updateCounter();
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+                scrollSlide(1);
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                scrollSlide(-1);
+            }
+        });
+
+        // Intersection Observer to update counter on scroll
+        const slides = document.querySelectorAll('.slide');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    currentSlide = parseInt(id.replace('slide-', ''));
+                    updateCounter();
+                }
+            });
+        }, { threshold: 0.5 });
+
+        slides.forEach(s => observer.observe(s));
+    </script>
+</body>
+</html>

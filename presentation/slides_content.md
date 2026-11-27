@@ -218,12 +218,16 @@ streamlit run src/streamlit_app.py
 
 ## Slide 12: Thank You & Q&A
 
-**Team:** Gulshan Kumar Shah  
+**Project Team Members:**
+- Rudransh Mishra (25AI1019)
+- Sahitya Panwar (25AI1042)
+- Gulshan Kumar Shah (25AI1019)
+
 **Course:** PRML (Pattern Recognition & Machine Learning)  
 **Institute:** Gati Shakti Vishwavidyalaya, Vadodara  
 **Semester:** 3rd Sem, B.Tech AI&DS  
 
-**Questions Welcome!**
+**Questions & Discussion Welcome!**
 
 ---
 

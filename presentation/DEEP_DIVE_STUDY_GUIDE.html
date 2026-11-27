@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRML Deep-Dive Study Guide — Theory + Code + Viva</title>
+    <style>
+        :root {
+            --primary: #0284c7;
+            --primary-dark: #0369a1;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --bg-card: #f8fafc;
+            --border: #e2e8f0;
+            --code-bg: #0f172a;
+            --code-text: #e2e8f0;
+            --accent-green: #16a34a;
+            --accent-orange: #ea580c;
+            --accent-purple: #9333ea;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: var(--text-main);
+            background: #f1f5f9;
+            line-height: 1.7;
+            padding: 30px 15px;
+        }
+
+        .paper {
+            max-width: 980px;
+            margin: 0 auto;
+            background: white;
+            padding: 50px 60px 80px 60px;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
+        }
+
+        .top-bar {
+            position: fixed;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            background: #1e293b;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 9999px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+
+        .print-btn {
+            background: #38bdf8;
+            color: #0f172a;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .print-btn:hover { background: #7dd3fc; }
+
+        header {
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 24px;
+            margin-bottom: 32px;
+        }
+
+        h1 { font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 6px; }
+        .subtitle { font-size: 15px; color: var(--text-muted); margin-bottom: 16px; }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 13.5px;
+        }
+
+        .meta-item strong { display: block; color: #0f172a; margin-bottom: 4px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        h2 {
+            font-size: 21px;
+            color: #0f172a;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+            margin: 40px 0 18px 0;
+            position: relative;
+        }
+
+        h2::before {
+            content: "";
+            position: absolute;
+            left: -4px;
+            top: 0;
+            bottom: -2px;
+            width: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        h3 {
+            font-size: 17px;
+            color: var(--primary-dark);
+            margin: 24px 0 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        h4 {
+            font-size: 15px;
+            color: #334155;
+            margin: 16px 0 8px 0;
+        }
+
+        p { margin-bottom: 12px; font-size: 14.5px; }
+
+        ul, ol { margin: 10px 0 16px 28px; font-size: 14.5px; }
+        li { margin-bottom: 8px; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0 24px 0;
+            font-size: 13.5px;
+        }
+
+        th, td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; vertical-align: top; }
+        th { background: #f8fafc; color: #0f172a; font-weight: 700; }
+        tr:nth-child(even) td { background: #fbfcfe; }
+
+        code {
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 13px;
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 16px 0;
+            font-size: 12.5px;
+            line-height: 1.5;
+            border-left: 3px solid var(--primary);
+        }
+
+        pre code { background: transparent; padding: 0; color: inherit; font-size: inherit; }
+
+        .comment { color: #64748b; }
+        .keyword { color: #c084fc; }
+        .string { color: #86efac; }
+        .number { color: #fde047; }
+        .function { color: #60a5fa; }
+
+        .concept-box {
+            background: #eff6ff;
+            border-left: 4px solid var(--primary);
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 16px 0;
+        }
+
+        .concept-title {
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        .why-box {
+            background: #fef3c7;
+            border-left: 4px solid var(--accent-orange);
+            padding: 14px 18px;
+            border-radius: 0 8px 8px 0;
+            margin: 12px 0;
+            font-size: 14px;
+        }
+
+        .why-title { font-weight: 700; color: #92400e; margin-bottom: 6px; }
+
+        .viva-box {
+            background: #f0fdf4;
+            border-left: 4px solid var(--accent-green);
+            padding: 14px 18px;
+            border-radius: 0 8px 8px 0;
+            margin: 12px 0;
+        }
+
+        .viva-q { font-weight: 700; color: #14532d; margin-bottom: 6px; }
+        .viva-a { color: #166534; font-size: 14px; }
+
+        .code-line { font-size: 12px; padding: 2px 6px; background: #f1f5f9; border-radius: 3px; margin: 2px 0; display: block; font-family: monospace; }
+
+        footer {
+            margin-top: 50px;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .top-bar { display: none; }
+            .paper { border: none; box-shadow: none; padding: 0; max-width: 100%; }
+            pre { page-break-inside: avoid; }
+            table { page-break-inside: avoid; }
+            .concept-box, .why-box, .viva-box { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <span style="font-size: 14px; font-weight: 600;">📚 PRML Deep-Dive: Theory → Code → Viva</span>
+    <button class="print-btn" onclick="window.print()">🖨️ Save as PDF</button>
+</div>
+
+<div class="paper">
+
+<header>
+    <h1>📘 PRML Complete Deep-Dive Study Guide</h1>
+    <div class="subtitle">Human Activity Recognition with Smartphones (UCI HAR) — Theory, Code Walkthrough, and Professor Viva Prep</div>
+    <div class="meta-grid">
+        <div class="meta-item"><strong>Project Team</strong>Rudransh Mishra (25AI1019) • Sahitya Panwar (25AI1042) • Gulshan Kumar Shah (25AI1019)</div>
+        <div class="meta-item"><strong>Course</strong>Pattern Recognition & Machine Learning (PRML) • B.Tech AI&DS Semester 3</div>
+        <div class="meta-item"><strong>Institute</strong>Gati Shakti Vishwavidyalaya, Vadodara</div>
+    </div>
+</header>
+
+<!-- ============================================================
+     MODULE 1: EXPLORATORY DATA ANALYSIS & DATA UNDERSTANDING
+============================================================ -->
+<h2>Module 1: Exploratory Data Analysis (EDA) & Sensor Data Anatomy</h2>
+
+<h3>1.1 What is EDA and Why Does It Matter?</h3>
+<div class="concept-box">
+    <div class="concept-title">Definition</div>
+    <p>Exploratory Data Analysis (EDA) is the process of investigating a dataset to understand its main characteristics, discover patterns, spot anomalies, test hypotheses, and check assumptions — <strong>before</strong> building any models. It is the "diagnostic phase" of machine learning.</p>
+</div>
+
+<div class="why-box">
+    <div class="why-title">Why EDA is Critical for This Project</div>
+    <ul>
+        <li><strong>Sensor Data is Noisy:</strong> Smartphone accelerometers/gyroscopes pick up vibrations, hand tremors, and sensor drift. EDA tells us if the data is clean or needs denoising.</li>
+        <li><strong>Class Imbalance Ruins Metrics:</strong> If "LAYING" has 5,000 samples but "WALKING_DOWNSTAIRS" has only 200, accuracy becomes meaningless. EDA verifies balance.</li>
+        <li><strong>Feature Redundancy:</strong> 561 features from 6 raw sensor channels means massive overlap. EDA (correlation heatmaps) proves we need dimensionality reduction.</li>
+        <li><strong>Normalization Check:</strong> ML algorithms (SVM, KNN, PCA) are distance-based. If one feature is 0.001 and another is 500, the large one dominates. EDA confirms the [-1, 1] range.</li>
+    </ul>
+</div>
+
+<h3>1.2 UCI HAR Dataset — Complete Anatomy</h3>
+<table>
+    <thead><tr><th>Attribute</th><th>Value</th><th>Technical Explanation</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Total Samples</strong></td><td>10,299</td><td>30 volunteers (ages 19-48) each performing 6 activities while wearing a Samsung Galaxy S II on the waist.</td></tr>
+        <tr><td><strong>Train/Test Split</strong></td><td>7,352 / 2,947 (71.4% / 28.6%)</td><td><strong>CRITICAL:</strong> Split is by <strong>subject (volunteer) identity</strong>, not random rows. Volunteer 1-21 in train, 22-30 in test. This prevents <em>data leakage</em> — the model never sees the same person's movement pattern in both train and test.</td></tr>
+        <tr><td><strong>Raw Sensors</strong></td><td>3-axis Accelerometer + 3-axis Gyroscope @ 50Hz</td><td>Accelerometer measures linear acceleration (m/s²) including gravity. Gyroscope measures angular velocity (rad/s). Both sampled every 20ms.</td></tr>
+        <tr><td><strong>Windowing</strong></td><td>2.56 sec windows (128 readings) with 50% overlap</td><td>Each sample = 2.56 seconds of activity. 50% overlap means consecutive windows share 1.28 seconds of data.</td></tr>
+        <tr><td><strong>Engineered Features</strong></td><td>561 per window</td><td>Computed from raw signals: Time domain (mean, std, max, min, SMA, energy, entropy, AR coefficients) + Frequency domain (FFT energy bands, skewness, kurtosis).</td></tr>
+        <tr><td><strong>Target Classes</strong></td><td>6 activities</td><td>WALKING, WALKING_UPSTAIRS, WALKING_DOWNSTAIRS, SITTING, STANDING, LAYING</td></tr>
+    </tbody>
+</table>
+
+<h3>1.3 Code Walkthrough: EDA Notebook (<code>notebooks/01_eda_detailed.ipynb</code>)</h3>
+
+<h4>Step 1: Loading & Path Resolution</h4>
+<pre><code><span class="comment"># Path resolution - why '../data/'?</span>
+<span class="comment"># Notebook runs from /AIML-PROJECT/notebooks/</span>
+<span class="comment"># Data sits in /AIML-PROJECT/data/ → go up one level (..) then into data/</span>
+<span class="keyword">train_path</span> = <span class="string">'../data/train.csv'</span>
+<span class="keyword">test_path</span> = <span class="string">'../data/test.csv'</span>
+
+train_df = pd.read_csv(train_path)
+test_df = pd.read_csv(test_path)
+</code></pre>
+<div class="viva-box">
+    <div class="viva-q">Viva Q: "Why not absolute path like /Users/gulshan/...?"</div>
+    <div class="viva-a">Relative paths make the project portable. Anyone cloning the repo can run it without changing paths. The notebook assumes working directory is the notebooks/ folder.</div>
+</div>
+
+<h4>Step 2: Data Integrity Audit (Missing Values, Duplicates, Types)</h4>
+<pre><code><span class="comment"># Missing values check</span>
+train_missing = train_df.isnull().sum().sum()
+test_missing = test_df.isnull().sum().sum()
+
+<span class="comment"># Duplicate rows check</span>
+train_dupes = train_df.duplicated().sum()
+test_dupes = test_df.duplicated().sum()
+
+<span class="comment"># Data types distribution</span>
+print(train_df.dtypes.value_counts())
+</code></pre>
+<div class="concept-box">
+    <div class="concept-title">Why These Specific Checks?</div>
+    <ul>
+        <li><code>.isnull().sum().sum()</code> → First sum gets NaN count per column, second sums across all columns → single integer = total missing cells.</li>
+        <li><code>.duplicated().sum()</code> → Checks if entire row is identical to another row. In sensor data, duplicates could mean logging glitches.</li>
+        <li><code>.dtypes.value_counts()</code> → Confirms all 561 features are numeric (<code>float64</code>) and target is categorical (<code>object</code>/<code>string</code>).</li>
+    </ul>
+</div>
+
+<h4>Step 3: Class Balance Verification</h4>
+<pre><code><span class="comment"># Target column is the LAST column (index -1)</span>
+target_col = train_df.columns[-1]  <span class="comment"># 'Activity'</span>
+
+<span class="comment"># value_counts() gives frequency of each unique value</span>
+<span class="comment"># sort_index() orders alphabetically: LAYING, SITTING, STANDING, WALKING, ...</span>
+train_counts = train_df[target_col].value_counts().sort_index()
+
+<span class="comment"># Percentage calculation</span>
+train_pct = (train_counts / len(train_df) * 100).round(2)
+
+<span class="comment"># Balance ratio = min_class_count / max_class_count</span>
+<span class="comment"># If ratio > 0.5, dataset is considered "balanced enough" for standard CV</span>
+balance_ratio = train_counts.min() / train_counts.max()
+</code></pre>
+<div class="why-box">
+    <div class="why-title">Why Balance Ratio > 0.5?</div>
+    <p>If one class has 1,400 samples and another only 200 (ratio = 0.14), a model that always predicts the majority class gets 87% accuracy but fails completely on the minority class. Our ratio is ~0.8 (lowest ~986 / highest ~1,407), which is healthy.</p>
+</div>
+
+<h4>Step 4: Feature Taxonomy Breakdown (Understanding the 561 Columns)</h4>
+<pre><code><span class="comment"># All columns except the last (target)</span>
+features = [c <span class="keyword">for</span> c <span class="keyword">in</span> train_df.columns <span class="keyword">if</span> c != target_col]
+
+<span class="comment"># Categorize by signal type using string prefix</span>
+time_domain = [f <span class="keyword">for</span> f <span class="keyword">in</span> features <span class="keyword">if</span> f.startswith(<span class="string">'t'</span>)]
+freq_domain = [f <span class="keyword">for</span> f <span class="keyword">in</span> features <span class="keyword">if</span> f.startswith(<span class="string">'f'</span>)]
+acc_features = [f <span class="keyword">for</span> f <span class="keyword">in</span> features <span class="keyword">if</span> <span class="string">'Acc'</span> <span class="keyword">in</span> f]
+gyro_features = [f <span class="keyword">for</span> f <span class="keyword">in</span> features <span class="keyword">if</span> <span class="string">'Gyro'</span> <span class="keyword">in</span> f]
+
+<span class="comment"># Statistical function breakdown</span>
+stat_functions = {}
+<span class="keyword">for</span> col <span class="keyword">in</span> features:
+    <span class="keyword">if</span> <span class="string">'-mean()-'</span> <span class="keyword">in</span> col: stat_functions[col] = <span class="string">'Mean'</span>
+    <span class="keyword">elif</span> <span class="string">'-std()-'</span> <span class="keyword">in</span> col: stat_functions[col] = <span class="string">'Std'</span>
+    <span class="keyword">elif</span> <span class="string">'-mad()-'</span> <span class="keyword">in</span> col: stat_functions[col] = <span class="string">'MAD (Median Absolute Deviation)'</span>
+    <span class="keyword">elif</span> <span class="string">'-max()-'</span> <span class="keyword">in</span> col: stat_functions[col] = <span class="string">'Max'</span>
+    <span class="keyword">elif</span> <span class="string">'-min()-'</span> <span class="keyword">in</span> col: stat_functions[col] = <span class="string">'Min'</span>
+    <span class="keyword">elif</span> <span class="string">'-energy()-'</span> <span class="keyword">in</span> col: stat_functions[col] = <span class="string">'Energy (Sum of Squares)'</span>
+    <span class="keyword">elif</span> <span class="string">'-entropy()-'</span> <span class="keyword">in</span> col: stat_functions[col] = <span class="string">'Entropy'</span>
+    <span class="keyword">elif</span> <span class="string">'-arCoeff()-'</span> <span class="keyword">in</span> col: stat_functions[col] = <span class="string">'Autoregression Coefficients'</span>
+    <span class="keyword">else</span>: stat_functions[col] = <span class="string">'Other'</span>
+</code></pre>
+
+<div class="concept-box">
+    <div class="concept-title">What Each Statistical Function Captures</div>
+    <table>
+        <thead><tr><th>Function</th><th>Formula / Concept</th><th>Physical Meaning for Motion</th></tr></thead>
+        <tbody>
+            <tr><td><strong>Mean</strong></td><td>μ = (1/N) Σ xᵢ</td><td>Average acceleration — gravity bias for static poses</td></tr>
+            <tr><td><strong>Std</strong></td><td>σ = √[(1/N) Σ(xᵢ - μ)²]</td><td>Movement intensity / variability</td></tr>
+            <tr><td><strong>MAD</strong></td><td>median(|xᵢ - median(x)|)</td><td>Robust variability (ignores outlier spikes)</td></tr>
+            <tr><td><strong>Energy</strong></td><td>Σ xᵢ²</td><td>Signal power — high for walking, low for sitting</td></tr>
+            <tr><td><strong>Entropy</strong></td><td>-Σ p(x) log p(x)</td><td>Signal complexity / predictability</td></tr>
+            <tr><td><strong>AR Coeff</strong></td><td>Coefficients of AR model</td><td>Temporal correlation structure</td></tr>
+            <tr><td><strong>FFT Bands</strong></td><td>Energy in freq bands</td><td>Dominant motion frequencies (step cadence ~1-2Hz)</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<h4>Step 5: Static vs Dynamic Separation Visualization</h4>
+<pre><code><span class="comment"># tBodyAccMag-mean() = magnitude of body acceleration averaged over window</span>
+<span class="comment"># tBodyAccMag-std() = standard deviation of that magnitude</span>
+
+sns.boxplot(data=train_df, x=target_col, y=<span class="string">'tBodyAccMag-mean()'</span>, palette=palette)
+sns.boxplot(data=train_df, x=target_col, y=<span class="string">'tBodyAccMag-std()'</span>, palette=palette)
+</code></pre>
+<div class="concept-box">
+    <div class="concept-title">Why These Two Features?</div>
+    <p><code>tBodyAccMag-mean()</code> captures the gravity vector magnitude (~1g = 9.81 m/s²). For static poses (SIT/STAND/LAY), this is ~1.0. For dynamic poses, body movement adds to gravity, changing the mean.<br><br>
+    <code>tBodyAccMag-std()</code> captures movement variability. Near-zero for static poses, high for walking/climbing stairs. This single 2D feature space (mean vs std) almost perfectly separates Dynamic vs Static activities!</p>
+</div>
+
+<h4>Step 6: PCA Preview (Why 2D Projection Works)</h4>
+<pre><code><span class="comment"># StandardScaler: zero mean, unit variance — REQUIRED for PCA</span>
+<span class="comment"># PCA finds directions of maximum variance in standardized space</span>
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X_train)
+
+pca = PCA(n_components=50, random_state=42)
+X_pca = pca.fit_transform(X_scaled)
+
+<span class="comment"># explained_variance_ratio_ tells how much info each PC captures</span>
+print(pca.explained_variance_ratio_[0])  <span class="comment"># PC1 variance %</span>
+print(pca.explained_variance_ratio_[1])  <span class="comment"># PC2 variance %</span>
+</code></pre>
+
+<div class="viva-box">
+    <div class="viva-q">Viva Q: "Why StandardScaler before PCA? Why not MinMaxScaler?"</div>
+    <div class="viva-a">PCA is based on variance (eigenvalues of covariance matrix). Features with larger absolute scale dominate the variance. StandardScaler makes each feature contribute equally by giving unit variance. MinMaxScaler only bounds to [0,1] but preserves relative scale differences. Since our features are already [-1,1], StandardScaler is the theoretically correct preprocessing for PCA.</div>
+</div>
+
+<h4>Step 7: Saving Artifacts for Next Notebooks</h4>
+<pre><code><span class="comment"># joblib serializes Python objects (DataFrames, arrays, fitted transformers)</span>
+<span class="comment"># compressed with zlib by default</span>
+joblib.dump((X_train, y_train, X_test, y_test), <span class="string">'../data/processed_data.pkl'</span>)
+
+<span class="comment"># Save EDA metadata for plotting in other notebooks</span>
+eda_artifacts = {
+    <span class="string">'feature_names'</span>: X_train.columns.tolist(),
+    <span class="string">'activity_colors'</span>: activity_colors,
+    <span class="string">'scaler'</span>: scaler,  <span class="comment"># Fitted scaler for consistent transformation</span>
+    <span class="string">'pca_explained_variance'</span>: pca.explained_variance_ratio_,
+}
+joblib.dump(eda_artifacts, <span class="string">'../models/eda_artifacts.pkl'</span>)
+</code></pre>
+
+---
+
+<!-- ============================================================
+     MODULE 2: UNSUPERVISED LEARNING — K-MEANS & DBSCAN
+============================================================ -->
+<h2>Module 2: Unsupervised Learning — K-Means Clustering & DBSCAN</h2>
+
+<h3>2.1 K-Means Clustering — Theory Deep Dive</h3>
+
+<div class="concept-box">
+    <div class="concept-title">What is K-Means?</div>
+    <p>K-Means is a centroid-based partitioning algorithm that divides N data points into K clusters by minimizing the <strong>Within-Cluster Sum of Squares (WCSS)</strong>, also called <strong>Inertia</strong>:</p>
+    <p style="font-family: monospace; background: #f1f5f9; padding: 8px; border-radius: 4px; display: inline-block;">
+        Inertia = Σ<sub>i=1 to K</sub> Σ<sub>x ∈ C<sub>i</sub></sub> ||x - μ<sub>i</sub>||²
+    </p>
+    <p>Where μ<sub>i</sub> is the centroid (mean) of cluster C<sub>i</sub>.</p>
+</div>
+
+<h4>The Algorithm (Lloyd's Algorithm):</h4>
+<ol>
+    <li><strong>Initialization:</strong> Pick K initial centroids (k-means++ smart seeding picks far-apart points).</li>
+    <li><strong>Assignment Step:</strong> Assign each point to nearest centroid (Euclidean distance).</li>
+    <li><strong>Update Step:</strong> Recompute centroids as mean of assigned points.</li>
+    <li><strong>Repeat</strong> steps 2-3 until centroids stop moving (convergence) or max iterations reached.</li>
+</ol>
+
+<h4>Key Hyperparameters:</h4>
+<table>
+    <thead><tr><th>Parameter</th><th>Our Value</th><th>Why?</th></tr></thead>
+    <tbody>
+        <tr><td><code>n_clusters</code></td><td>6 (varied 2-10 for search)</td><td>Must test range; 6 matches physical activities</td></tr>
+        <tr><td><code>init</code></td><td><code>'k-means++'</code> (default)</td><td>Smart initialization avoids poor local minima. Random init often fails.</td></tr>
+        <tr><td><code>n_init</code></td><td>10</td><td>Run algorithm 10 times with different seeds, keep best (lowest inertia). Critical for stability!</td></tr>
+        <tr><td><code>max_iter</code></td><td>300 (default)</td><td>Usually converges in <50 iterations for this dataset.</td></tr>
+        <tr><td><code>random_state</code></td><td>42</td><td>Reproducibility. Same seed = same results every run.</td></tr>
+    </tbody>
+</table>
+
+<h3>2.2 Finding Optimal K — Elbow Method & Silhouette Score</h3>
+
+<h4>A. Elbow Method (Inertia vs K)</h4>
+<pre><code>inertias = []
+silhouettes = []
+K_range = range(2, 11)  <span class="comment"># Test K = 2, 3, ..., 10</span>
+
+<span class="keyword">for</span> k <span class="keyword">in</span> K_range:
+    km = KMeans(n_clusters=k, random_state=42, n_init=10)
+    labels = km.fit_predict(X_scaled)  <span class="comment"># Fit + predict in one call</span>
+    inertias.append(km.inertia_)  <span class="comment"># WCSS — lower is better</span>
+
+    <span class="comment"># Silhouette needs sampling for speed on 7,352 points</span>
+    sil = silhouette_score(X_scaled, labels, sample_size=3000, random_state=42)
+    silhouettes.append(sil)
+</code></pre>
+
+<div class="concept-box">
+    <div class="concept-title">Interpreting the Elbow Plot</div>
+    <ul>
+        <li>Inertia <strong>always decreases</strong> as K increases (more centroids = points closer to their centroid).</li>
+        <li>The "elbow" = point of <strong>diminishing returns</strong>. Going from K=5 to K=6 drops inertia sharply; K=6 to K=7 drops much less.</li>
+        <li><strong>For our data:</strong> The elbow is clearly at K=6 — matches the 6 ground-truth activities!</li>
+    </ul>
+</div>
+
+<h4>B. Silhouette Score (Cluster Quality Metric)</h4>
+<div class="concept-box">
+    <div class="concept-title">Mathematical Definition</div>
+    <p>For a single sample x:</p>
+    <ul>
+        <li><strong>a(x)</strong> = mean distance to all other points in the <strong>same</strong> cluster (cohesion).</li>
+        <li><strong>b(x)</strong> = mean distance to points in the <strong>nearest other</strong> cluster (separation).</li>
+        <li><strong>Silhouette(x) = (b(x) - a(x)) / max(a(x), b(x))</strong> ∈ [-1, 1]</li>
+    </ul>
+    <ul>
+        <li>+1: Well-matched to own cluster, far from others.</li>
+        <li>0: On the boundary between clusters.</li>
+        <li>-1: Assigned to wrong cluster.</li>
+    </ul>
+    <p>Mean silhouette across all samples = overall clustering quality.</p>
+</div>
+
+<pre><code><span class="comment"># silhouette_score uses sampling for large datasets</span>
+sil = silhouette_score(X_scaled, labels, sample_size=3000, random_state=42)
+</code></pre>
+
+<div class="viva-box">
+    <div class="viva-q">Viva Q: "Why sample_size=3000? Why not use all 7,352 points?"</div>
+    <div class="viva-a">Silhouette score computes pairwise distances between all points in a cluster → O(N²) complexity. 7,352² ≈ 54 million distance computations per K value. Sampling 3,000 gives a statistically reliable estimate in seconds instead of minutes. random_state=42 ensures reproducible sampling.</div>
+</div>
+
+<h3>2.3 Cluster Validation Against Ground Truth</h3>
+
+<p>Since we have true labels (unsupervised learning doesn't usually!), we can measure how well clusters match reality:</p>
+
+<pre><code>from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score
+
+ari = adjusted_rand_score(y_train, kmeans_labels)
+nmi = normalized_mutual_info_score(y_train, kmeans_labels)
+</code></pre>
+
+<div class="concept-box">
+    <div class="concept-title">Adjusted Rand Index (ARI)</div>
+    <p>Compares two partitions (our clusters vs true labels) by counting pairs of samples:</p>
+    <ul>
+        <li><strong>RI (Rand Index)</strong> = (TP + TN) / (TP + TN + FP + FN) — but high RI can happen by chance.</li>
+        <li><strong>ARI</strong> corrects for chance: ARI = (RI - Expected_RI) / (Max_RI - Expected_RI). Range [-1, 1]. 0 = random labeling, 1 = perfect match.</li>
+    </ul>
+</div>
+
+<div class="concept-box">
+    <div class="concept-title">Normalized Mutual Information (NMI)</div>
+    <p>Information-theoretic measure: how much knowing the cluster reduces uncertainty about the true class.</p>
+    <p>NMI = 2 * I(C; L) / (H(C) + H(L)) where I = mutual information, H = entropy. Range [0, 1].</p>
+</div>
+
+<div class="viva-box">
+    <div class="viva-q">Viva Q: "Your ARI is only 0.448. Is that good or bad?"</div>
+    <div class="viva-a">For K-Means on high-dimensional sensor data without label guidance, ARI ~0.45 is actually quite meaningful! It means the unsupervised clusters capture nearly half the information in the true activity labels. The remaining discrepancy is because K-Means uses spherical Euclidean clusters, but activities like SITTING vs STANDING have similar acceleration magnitudes — they overlap in feature space and need non-linear boundaries (which SVM provides in supervised phase).</div>
+</div>
+
+<h3>2.4 DBSCAN — Density-Based Clustering</h3>
+
+<div class="concept-box">
+    <div class="concept-title">How DBSCAN Works (vs K-Means)</div>
+    <p><strong>K-Means:</strong> Assumes spherical clusters of similar size. Fails on arbitrary shapes.<br>
+    <strong>DBSCAN:</strong> Groups points in <strong>high-density regions</strong> separated by <strong>low-density regions</strong>. Can find arbitrary shapes and identify <strong>noise/outliers</strong> (label = -1).</p>
+</div>
+
+<h4>Core Concepts:</h4>
+<ul>
+    <li><strong>ε (eps):</strong> Radius of neighborhood around a point.</li>
+    <li><strong>MinPts (min_samples):</strong> Minimum points in ε-neighborhood to form a <strong>core point</strong>.</li>
+    <li><strong>Core Point:</strong> ≥ MinPts neighbors within ε.</li>
+    <li><strong>Border Point:</strong> < MinPts neighbors, but within ε of a core point.</li>
+    <li><strong>Noise/Outlier:</strong> Neither core nor border (label = -1).</li>
+</ul>
+
+<h4>Tuning ε with K-Distance Graph:</h4>
+<pre><code><span class="comment"># K-distance graph: for each point, find distance to its k-th nearest neighbor</span>
+<span class="comment"># Sort these distances; the "knee" = optimal eps</span>
+from sklearn.neighbors import NearestNeighbors
+
+neighbors = NearestNeighbors(n_neighbors=5)  <span class="comment"># 5-NN for min_samples=5</span>
+neighbors.fit(X_scaled)
+distances, _ = neighbors.kneighbors(X_scaled)
+sorted_distances = np.sort(distances[:, -1])  <span class="comment"># Distance to 5th nearest neighbor</span>
+
+plt.plot(sorted_distances)  <span class="comment"># Look for sharp knee/elbow</span>
+</code></pre>
+
+<div class="concept-box">
+    <div class="concept-title">Why 5-NN Distance?</div>
+    <p>We set <code>min_samples=5</code>. The distance to the 5th nearest neighbor represents the local density threshold. If we set ε to this distance, a typical point will have ~5 neighbors. The "knee" in the sorted curve is where density changes sharply — the natural boundary between dense clusters and sparse noise.</p>
+</div>
+
+<h4>DBSCAN Code with Tuned Parameters:</h4>
+<pre><code>dbscan = DBSCAN(eps=15.0, min_samples=5)
+dbscan_labels = dbscan.fit_predict(X_scaled)
+
+n_clusters_ = len(set(dbscan_labels)) - (1 <span class="keyword">if</span> -1 <span class="keyword">in</span> dbscan_labels <span class="keyword">else</span> 0)
+n_noise_ = list(dbscan_labels).count(-1)
+</code></pre>
+
+<div class="viva-box">
+    <div class="viva-q">Viva Q: "How did you decide eps=15.0 exactly?"</div>
+    <div class="viva-a">From the 5-NN distance graph, we observed a clear knee at approximately distance 15.0. We verified by running DBSCAN with eps in [10, 12, 15, 18, 20] and selecting the value that gave 6 clusters (matching activities) with minimal noise (~5-10%). eps=15.0 gave 6 clusters and ~5% noise points.</div>
+</div>
+
+---
+
+<!-- ============================================================
+     MODULE 3: FEATURE SELECTION & PCA
+============================================================ -->
+<h2>Module 3: Dimensionality Reduction — Feature Selection (SelectKBest) & PCA</h2>
+
+<h3>3.1 Filter-Based Selection: SelectKBest with ANOVA F-Test</h3>
+
+<div class="concept-box">
+    <div class="concept-title">What is ANOVA F-Test for Feature Selection?</div>
+    <p>ANOVA (Analysis of Variance) tests whether the means of a feature differ significantly across classes.</p>
+    <p><strong>F-Statistic = Between-Class Variance / Within-Class Variance</strong></p>
+    <ul>
+        <li><strong>Between-Class Variance:</strong> How much class means differ from overall mean.</li>
+        <li><strong>Within-Class Variance:</strong> Average spread of feature within each class.</li>
+        <li><strong>High F</strong> = Feature values cluster tightly within each class but class centers are far apart = <strong>High discriminative power</strong>.</li>
+    </ul>
+    <p>SelectKBest ranks all 561 features by F-score and keeps top <code>k</code>.</p>
+</div>
+
+<h4>Code Walkthrough:</h4>
+<pre><code>from sklearn.feature_selection import SelectKBest, f_classif
+
+k_values = [50, 100, 150, 200, 300, 400]
+skb_scores = []
+
+benchmark_clf = RandomForestClassifier(n_estimators=50, random_state=42, n_jobs=-1)
+
+<span class="keyword">for</span> k <span class="keyword">in</span> k_values:
+    <span class="comment"># SelectKBest fits on TRAIN only, then transforms both train & test</span>
+    selector = SelectKBest(f_classif, k=k)
+    X_sub = selector.fit_transform(X_train_scaled, y_train_enc)
+
+    <span class="comment"># Cross-validate on reduced feature set</span>
+    score = cross_val_score(benchmark_clf, X_sub, y_train_enc, cv=cv, scoring='accuracy', n_jobs=-1).mean()
+    skb_scores.append(score)
+</code></pre>
+
+<div class="concept-box">
+    <div class="concept-title">Why fit_transform on Train, Only transform on Test?</div>
+    <p><code>fit()</code> computes F-scores and learns which k features to keep. <code>transform()</code> applies that same selection. If you <code>fit()</code> on test data, you leak test information (data leakage)! <code>selector.get_support()</code> returns boolean mask of selected features.</p>
+</div>
+
+<h3>3.2 PCA — Principal Component Analysis (Deep Theory)</h3>
+
+<div class="concept-box">
+    <div class="concept-title">What is PCA Mathematically?</div>
+    <p>PCA is an orthogonal linear transformation that projects data onto a new coordinate system where:</p>
+    <ol>
+        <li>First axis (PC1) captures maximum variance.</li>
+        <li>Second axis (PC2) captures maximum remaining variance orthogonal to PC1.</li>
+        <li>...</li>
+    </ol>
+    <p>Mathematically: <strong>Eigendecomposition of the Covariance Matrix</strong></p>
+    <p>Given standardized data X (n × d), covariance Σ = (1/(n-1)) XᵀX. Solve Σv = λv for eigenvectors v (principal components) and eigenvalues λ (variance captured).</p>
+    <p>Sort eigenvalues λ₁ ≥ λ₂ ≥ ... ≥ λ<sub>d</sub>. PC1 = v₁, PC2 = v₂, etc.</p>
+    <p>Cumulative variance = Σ λ<sub>i</sub> / Σ λ<sub>total</sub>.</p>
+</div>
+
+<h4>PCA Code with 95% Variance Threshold:</h4>
+<pre><code><span class="comment"># StandardScaler is MANDATORY before PCA</span>
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X_train)
+
+<span class="comment"># n_components=0.95 means "keep enough PCs to explain 95% of variance"</span>
+pca_95 = PCA(n_components=0.95, random_state=42)
+X_train_pca = pca_95.fit_transform(X_scaled)
+
+<span class="comment"># Key attributes</span>
+n_components = pca_95.n_components_  <span class="comment"># How many PCs needed for 95%</span>
+cumsum_var = np.cumsum(pca_95.explained_variance_ratio_)  <span class="comment"># Cumulative variance</span>
+
+<span class="comment"># Transform test data using SAME fitted PCA</span>
+X_test_pca = pca_95.transform(scaler.transform(X_test))
+</code></pre>
+
+<div class="concept-box">
+    <div class="concept-title">Explained Variance Ratio — What It Means</div>
+    <p><code>pca.explained_variance_ratio_</code> = [λ₁/Σλ, λ₂/Σλ, ..., λ<sub>d</sub>/Σλ]. Each value is the fraction of total dataset variance captured by that PC.</p>
+    <ul>
+        <li>PC1 might explain 35% of all variance.</li>
+        <li>PC2 might explain 18%.</li>
+        <li>First 102 PCs together explain 95% (cumulative sum ≥ 0.95).</li>
+    </ul>
+    <p>This means the remaining 459 components (561 - 102) only contain 5% of the signal — mostly noise!</p>
+</div>
+
+<h4>Scree Plot & Cumulative Variance Plot:</h4>
+<pre><code><span class="comment"># Scree plot: individual variance per PC</span>
+plt.plot(range(1, 51), explained_var[:50], 'bo-')
+
+<span class="comment"># Cumulative: how many PCs for X% variance</span>
+plt.plot(range(1, 101), cumsum_var[:100], 'ro-')
+plt.axhline(0.95, color='red', linestyle='--', label='95% threshold')
+</code></pre>
+
+<div class="viva-box">
+    <div class="viva-q">Viva Q: "Why n_components=0.95 (float) instead of n_components=102 (int)?"</div>
+    <div class="viva-a">Using <code>0.95</code> tells PCA: "automatically determine how many components are needed to reach 95% cumulative variance." This is more robust than hardcoding 102 because if we change the dataset or preprocessing, the required number of components might change. The float syntax makes the pipeline adaptive.</div>
+</div>
+
+<h3>3.3 Comparison: All Features vs RF Importance vs PCA</h3>
+
+<pre><code><span class="comment"># Benchmark SVM on three feature spaces</span>
+svm = SVC(kernel='rbf', C=10.0, random_state=42)
+
+<span class="comment"># 1. All 561 features</span>
+acc_all = cross_val_score(svm, X_train_scaled, y_train_enc, cv=cv, scoring='accuracy').mean()
+
+<span class="comment"># 2. RF Importance (Top 100)</span>
+acc_fs = score_fs
+
+<span class="comment"># 3. PCA 95% variance</span>
+acc_pca = cross_val_score(svm, X_train_pca, y_train_enc, cv=cv, scoring='accuracy').mean()
+</code></pre>
+
+---
+
+<!-- ============================================================
+     MODULE 4: SUPERVISED MODELS — THEORY & CODE
+============================================================ -->
+<h2>Module 4: Supervised Classification — 11 Models Benchmarked</h2>
+
+<h3>4.1 Model Zoo — Theory for Each Algorithm</h3>
+
+<table>
+    <thead><tr><th>Model</th><th>Core Theory</th><th>Key Hyperparameters</th><th>Our Value & Reason</th></tr></thead>
+    <tbody>
+        <tr>
+            <td><strong>Gaussian Naive Bayes</strong></td>
+            <td>Bayes theorem with assumption: P(x|y) = ∏ P(xᵢ|y) — features independent given class. Gaussian = P(xᵢ|y) ~ N(μ<sub>y</sub>, σ²<sub>y</sub>).</td>
+            <td>No real hyperparameters (only <code>var_smoothing</code>)</td>
+            <td>Defaults. Fast baseline.</td>
+        </tr>
+        <tr>
+            <td><strong>Decision Tree (Gini)</strong></td>
+            <td>Recursive binary partitioning. At each node, choose feature & threshold minimizing <strong>Gini Impurity</strong> = 1 - Σ p<sub>c</sub>².</td>
+            <td><code>max_depth</code>, <code>min_samples_split</code>, <code>criterion</code></td>
+            <td>Defaults (unlimited depth → overfits). <code>random_state=42</code>.</td>
+        </tr>
+        <tr>
+            <td><strong>KNN (k=1,3,5)</strong></td>
+            <td>Lazy learner. Predicts class of k nearest neighbors by Euclidean distance. k=1 = 1-NN (high variance). k=5 = smoother boundaries.</td>
+            <td><code>n_neighbors</code>, <code>weights</code>, <code>metric</code></td>
+            <td>k=1,3,5. <code>weights='uniform'</code> (default).</td>
+        </tr>
+        <tr>
+            <td><strong>Weighted KNN</strong></td>
+            <td>Same as KNN but vote weight = 1 / distance(x, xᵢ). Closer neighbors influence more.</td>
+            <td><code>weights='distance'</code></td>
+            <td><code>n_neighbors=3</code> or <code>5</code>, <code>weights='distance'</code>.</td>
+        </tr>
+        <tr>
+            <td><strong>Random Forest</strong></td>
+            <td>Ensemble of Decision Trees with <strong>Bagging</strong> (bootstrap samples) + <strong>Feature Subsampling</strong> (max_features at each split). Reduces variance without increasing bias.</td>
+            <td><code>n_estimators</code>, <code>max_depth</code>, <code>max_features</code>, <code>bootstrap</code></td>
+            <td><code>n_estimators=100</code>, <code>max_features='sqrt'</code> (default), <code>bootstrap=True</code>, <code>n_jobs=-1</code> (all CPU cores).</td>
+        </tr>
+        <tr>
+            <td><strong>AdaBoost (SAMME.R)</strong></td>
+            <td>Sequential boosting. Each weak learner (Decision Stump) focuses on previously misclassified samples by reweighting them. SAMME.R uses real-valued probability updates.</td>
+            <td><code>n_estimators</code>, <code>learning_rate</code>, <code>algorithm</code></td>
+            <td><code>n_estimators=100</code>, <code>learning_rate=1.0</code>, <code>algorithm='SAMME.R'</code>.</td>
+        </tr>
+        <tr>
+            <td><strong>SVM (RBF Kernel)</strong></td>
+            <td>Max-margin classifier in high-dimensional space. RBF Kernel: K(x, x') = exp(-γ ||x - x'||²). γ controls influence radius. C controls soft-margin tradeoff.</td>
+            <td><code>C</code>, <code>kernel</code>, <code>gamma</code></td>
+            <td><code>kernel='rbf'</code>, <code>C=10.0</code>, <code>gamma='scale'</code> (1/(n_features * X.var())).</td>
+        </tr>
+        <tr>
+            <td><strong>SVM (Poly Kernel)</strong></td>
+            <td>K(x, x') = (γ x·x' + r)<sup>d</sup>. d = degree. Good for polynomial decision boundaries.</td>
+            <td><code>degree</code>, <code>coef0</code> (r), <code>gamma</code></td>
+            <td><code>degree=3</code>, <code>C=1.0</code>, <code>gamma='scale'</code>.</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>4.2 Cross-Validation Strategy — Stratified K-Fold</h3>
+
+<pre><code>from sklearn.model_selection import StratifiedKFold
+
+<span class="comment"># StratifiedKFold preserves class % in each fold</span>
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+</code></pre>
+
+<div class="concept-box">
+    <div class="concept-title">Why Stratified? Why 5 Folds? Why Shuffle?</div>
+    <ul>
+        <li><strong>Stratified:</strong> Each fold has exactly same % of each of the 6 classes. Without stratification, a fold might have 0 samples of WALKING_DOWNSTAIRS → model never sees it during training for that fold.</li>
+        <li><strong>5 Folds:</strong> Standard tradeoff. More folds (e.g., 10) = more training data per fold (90% vs 80%) but 2× compute time. 5 is standard.</li>
+        <li><strong>Shuffle=True:</strong> Data is sorted by subject/activity. Without shuffle, fold 1 might be all "LAYING" samples. <code>random_state=42</code> ensures reproducible splits.</li>
+    </ul>
+</div>
+
+<h3>4.3 Cross-Validation Scoring — Multiple Metrics</h3>
+
+<pre><code><span class="comment"># cross_val_score returns array of scores (one per fold)</span>
+cv_acc = cross_val_score(model, X_train_scaled, y_train_enc, cv=cv, scoring='accuracy', n_jobs=-1)
+cv_prec = cross_val_score(model, X_train_scaled, y_train_enc, cv=cv, scoring='precision_macro', n_jobs=-1)
+cv_rec = cross_val_score(model, X_train_scaled, y_train_enc, cv=cv, scoring='recall_macro', n_jobs=-1)
+cv_f1 = cross_val_score(model, X_train_scaled, y_train_enc, cv=cv, scoring='f1_macro', n_jobs=-1)
+
+<span class="comment"># Mean ± Std across 5 folds</span>
+print(f"{name}: Acc={cv_acc.mean():.4f}±{cv_acc.std():.4f}")
+</code></pre>
+
+<div class="concept-box">
+    <div class="concept-title">Macro vs Micro vs Weighted Averaging</div>
+    <ul>
+        <li><strong>Macro:</strong> Compute metric per class, then average. Treats all classes equally. Best for balanced classes.</li>
+        <li><strong>Micro:</strong> Aggregate TP, FP, FN globally, then compute. Favors majority classes.</li>
+        <li><strong>Weighted:</strong> Macro but weighted by class support (sample count).</li>
+    </ul>
+    <p>We use <strong>Macro</strong> because our classes are roughly balanced and we care equally about all 6 activities.</p>
+</div>
+
+<h3>4.4 Final Test Set Evaluation (Holdout)</h3>
+
+<pre><code><span class="comment"># Fit on FULL training data (7,352 samples)</span>
+model.fit(X_train_scaled, y_train_enc)
+
+<span class="comment"># Predict on UNSEEN test data (2,947 samples)</span>
+y_pred = model.predict(X_test_scaled)
+
+<span class="comment"># Metrics</span>
+acc = accuracy_score(y_test_enc, y_pred)
+prec = precision_score(y_test_enc, y_pred, average='macro')
+rec = recall_score(y_test_enc, y_pred, average='macro')
+f1 = f1_score(y_test_enc, y_pred, average='macro')
+
+<span class="comment"># Confusion Matrix</span>
+cm = confusion_matrix(y_test_enc, y_pred)
+</code></pre>
+
+<div class="viva-box">
+    <div class="viva-q">Viva Q: "Why fit on full training data for final test, not cross-validate?"</div>
+    <div class="viva-a">Cross-validation is for <strong>model selection and hyperparameter tuning</strong>. Once we pick the best model (SVM RBF), we retrain it on ALL 7,352 training samples to maximize data usage before the final holdout test. The test set (2,947 samples) must remain completely untouched until this final evaluation — it simulates real-world deployment on new users.</div>
+</div>
+
+---
+
+<!-- ============================================================
+     MODULE 5: ENSEMBLE METHODS — HARD vs SOFT VOTING
+============================================================ -->
+<h2>Module 5: Ensemble Learning — Hard Voting vs Soft Voting</h2>
+
+<h3>5.1 Why Ensembles Work — Bias-Variance Decomposition</h3>
+
+<div class="concept-box">
+    <div class="concept-title">Expected Error = Bias² + Variance + Irreducible Error</div>
+    <ul>
+        <li><strong>Bias:</strong> Error from wrong assumptions (e.g., linear model on curved boundary). High bias = underfitting.</li>
+        <li><strong>Variance:</strong> Error from sensitivity to training data fluctuations. High variance = overfitting.</li>
+        <li><strong>Ensembles reduce VARIANCE</strong> by averaging diverse models. If models make independent errors, averaging cancels them out.</li>
+    </ul>
+    <p><strong>Diversity is key!</strong> Models must make <strong>different errors</strong> on different samples. That's why we combine SVM (kernel), Random Forest (trees), KNN (instance-based), AdaBoost (boosting).</p>
+</div>
+
+<h3>5.2 Hard Voting vs Soft Voting — Mathematical Difference</h3>
+
+<h4>Hard Voting (Majority Rule):</h4>
+<p>Each model outputs a single class label. The ensemble predicts the class with the most votes.</p>
+<p style="font-family: monospace; background: #f1f5f9; padding: 8px; border-radius: 4px; display: inline-block;">
+    ŷ = mode { C₁(x), C₂(x), C₃(x), C₄(x) }
+</p>
+
+<h4>Soft Voting (Probability Averaging):</h4>
+<p>Each model outputs class probabilities (requires <code>probability=True</code> for SVM). The ensemble averages probabilities and takes argmax.</p>
+<p style="font-family: monospace; background: #f1f5f9; padding: 8px; border-radius: 4px; display: inline-block;">
+    ŷ = argmax<sub>c</sub> Σ<sub>i=1..M</sub> P<sub>i</sub>(y = c | x)
+</p>
+
+<div class="concept-box">
+    <div class="concept-title">Why Soft Voting Usually Wins</div>
+    <p>Hard voting treats a 51% confident prediction equal to a 99% confident one. Soft voting respects confidence:</p>
+    <ul>
+        <li>Sample A: SVM 95% "Walking", RF 52% "Standing", KNN 51% "Standing" → Soft picks "Walking" (correct!). Hard picks "Standing" (2 vs 1).</li>
+        <li>Soft voting uses the <strong>full posterior distribution</strong> which contains more information than just the argmax.</li>
+    </ul>
+</div>
+
+<h3>5.3 Ensemble Construction Code</h3>
+
+<pre><code><span class="comment"># Base estimators — must be DIVERSE</span>
+clf_svm = SVC(kernel='rbf', C=10.0, probability=True, random_state=42)  <span class="comment"># probability=True REQUIRED for soft voting</span>
+clf_rf = RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1)
+clf_knn = KNeighborsClassifier(n_neighbors=5, weights='distance')
+clf_ada = AdaBoostClassifier(n_estimators=100, random_state=42)
+
+estimators = [
+    (<span class="string">'svm'</span>, clf_svm),
+    (<span class="string">'rf'</span>, clf_rf),
+    (<span class="string">'knn'</span>, clf_knn),
+    (<span class="string">'ada'</span>, clf_ada)
+]
+
+<span class="comment"># Hard Voting</span>
+hard_voting = VotingClassifier(estimators=estimators, voting='hard')
+
+<span class="comment"># Soft Voting</span>
+soft_voting = VotingClassifier(estimators=estimators, voting='soft')
+
+<span class="comment"># Fit both on full training data</span>
+hard_voting.fit(X_train_scaled, y_train_enc)
+soft_voting.fit(X_train_scaled, y_train_enc)
+</code></pre>
+
+<div class="viva-box">
+    <div class="viva-q">Viva Q: "Why probability=True for SVM? What happens if False?"</div>
+    <div class="viva-a"><code>SVC(probability=True)</code> enables <code>predict_proba()</code> by fitting an additional calibration model (Platt scaling: logistic regression on SVM decision scores) via 5-fold CV internally. Without it, <code>soft_voting</code> fails because SVM cannot output probabilities. Hard voting doesn't need it. The extra computation is worth it for the accuracy gain.</div>
+</div>
+
+<h3>5.4 Test Results Comparison</h3>
+
+<pre><code>all_models = {
+    'SVM': clf_svm, 'RF': clf_rf, 'KNN': clf_knn, 'AdaBoost': clf_ada,
+    'Hard Voting': hard_voting, 'Soft Voting': soft_voting
+}
+
+<span class="keyword">for</span> name, model <span class="keyword">in</span> all_models.items():
+    preds = model.predict(X_test_scaled)
+    acc = accuracy_score(y_test_enc, preds)
+    f1 = f1_score(y_test_enc, preds, average='macro')
+    <span class="comment"># Store and compare...</span>
+</code></pre>
+
+---
+
+<!-- ============================================================
+     MODULE 6: COMPLETE PIPELINE CODE STRUCTURE
+============================================================ -->
+<h2>Module 6: Complete Pipeline — File Structure & Execution Order</h2>
+
+<h3>6.1 Project Directory Layout</h3>
+<pre><code>AIML-PROJECT/
+├── data/
+│   ├── train.csv, test.csv              # Raw data (downloaded or from UCI)
+│   └── processed_data.pkl               # Generated by Notebook 01
+├── notebooks/
+│   ├── 01_eda_detailed.ipynb            # EDA → saves processed_data.pkl, eda_artifacts.pkl
+│   ├── 02_clustering.ipynb              # K-Means + DBSCAN → saves clustering_results.pkl
+│   ├── 03_modeling.ipynb                # 11 models CV → saves modeling_results.pkl
+│   ├── 04_pca_feature_selection.ipynb   # SelectKBest + PCA → saves fs_pca_results.pkl
+│   └── 05_ensemble_evaluation.ipynb     # Ensembles + final test → saves final_evaluation_results.pkl
+├── models/                              # All .pkl artifacts
+├── presentation/                        # 14 PNG charts + slides.html + STUDY_GUIDE.html
+├── src/
+│   └── streamlit_app.py                 # Interactive demo
+├── download_data.py                     # Auto-downloads UCI HAR if CSV missing
+├── requirements.txt
+└── README.md
+</code></pre>
+
+<h3>6.2 Execution Order (Critical!)</h3>
+<ol>
+    <li><code>pip install -r requirements.txt</code></li>
+    <li><code>python download_data.py</code> (if train.csv/test.csv missing)</li>
+    <li>Run <strong>Notebook 01</strong> → produces <code>data/processed_data.pkl</code> (REQUIRED by all later notebooks)</li>
+    <li>Run <strong>Notebook 02</strong> → produces <code>models/clustering_results.pkl</code></li>
+    <li>Run <strong>Notebook 03</strong> → produces <code>models/modeling_results.pkl</code></li>
+    <li>Run <strong>Notebook 04</strong> → produces <code>models/fs_pca_results.pkl</code></li>
+    <li>Run <strong>Notebook 05</strong> → produces <code>models/final_evaluation_results.pkl</code> (REQUIRED by Streamlit)</li>
+    <li><code>streamlit run src/streamlit_app.py</code></li>
+</ol>
+
+<h3>6.3 Key Code Patterns Used Across Notebooks</h3>
+
+<h4>Standard Imports (Every Notebook):</h4>
+<pre><code>import os, warnings, joblib
+import numpy as np, pandas as pd
+import matplotlib.pyplot as plt, seaborn as sns
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.model_selection import StratifiedKFold, cross_val_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+
+warnings.filterwarnings('ignore')
+os.makedirs('../models', exist_ok=True)
+os.makedirs('../presentation', exist_ok=True)
+plt.style.use('seaborn-v0_8-whitegrid')
+</code></pre>
+
+<h4>Loading Data (Notebooks 02-05):</h4>
+<pre><code><span class="comment"># All notebooks load the standardized split from Notebook 01</span>
+X_train, y_train, X_test, y_test = joblib.load('../data/processed_data.pkl')
+
+<span class="comment"># Encode string labels (e.g., "WALKING") to integers (0,1,2,3,4,5)</span>
+le = LabelEncoder()
+y_train_enc = le.fit_transform(y_train)
+y_test_enc = le.transform(y_test)
+
+<span class="comment"># Scale features (StandardScaler fitted on TRAIN only)</span>
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)  <span class="comment"># transform only!</span>
+</code></pre>
+
+<h4>Saving Artifacts (Every Notebook):</h4>
+<pre><code>joblib.dump({
+    'key_results': results_dict,
+    'fitted_objects': fitted_objects,  <span class="comment"># scalers, selectors, PCAs, models</span>
+    'metadata': metadata_dict
+}, '../models/meaningful_name.pkl')
+</code></pre>
+
+---
+
+<!-- ============================================================
+     MODULE 7: PROFESSOR VIVA QUESTIONS WITH DEEP ANSWERS
+============================================================ -->
+<h2>Module 7: Professor Viva — Anticipated Questions & Deep Answers</h2>
+
+<div class="viva-box">
+    <div class="viva-q">Q1: "Why did you use StandardScaler and not MinMaxScaler? When would you use each?"</div>
+    <div class="viva-a">
+        <strong>StandardScaler (Z-score):</strong> x' = (x - μ) / σ. Centers data at 0, unit variance.<br>
+        <strong>Use when:</strong> Algorithm uses distance (KNN, SVM), gradient descent (Linear/Logistic Regression, Neural Nets), or variance-based methods (PCA). <br><br>
+        <strong>MinMaxScaler:</strong> x' = (x - min) / (max - min). Bounds to [0, 1].<br>
+        <strong>Use when:</strong> Algorithm needs bounded input (e.g., neural nets with sigmoid/tanh, image pixels), or when you want to preserve exact zero values in sparse data. <br><br>
+        <strong>Our Case:</strong> PCA, SVM (RBF uses Euclidean distance), KNN, and Logistic Regression all need StandardScaler. Our data is already in [-1, 1] from UCI preprocessing, but StandardScaler centers it at 0 which PCA requires.
+    </div>
+</div>
+
+<div class="viva-box">
+    <div class="viva-q">Q2: "Explain the Kernel Trick in SVM RBF. Why not just use Linear SVM?"</div>
+    <div class="viva-a">
+        <strong>Linear SVM:</strong> Finds hyperplane w·x + b = 0. Only works if classes are linearly separable. In 561-D sensor space, walking vs sitting boundaries are CURVED, not flat planes.<br><br>
+        <strong>Kernel Trick:</strong> Instead of explicitly mapping x → φ(x) in high-D space (expensive!), we compute dot products in that space via kernel function K(x, x') = φ(x)·φ(x').<br><br>
+        <strong>RBF Kernel:</strong> K(x, x') = exp(-γ ||x - x'||²). This implicitly maps to INFINITE-dimensional space where a linear hyperplane corresponds to a NON-LINEAR boundary in original space. γ controls "reach" of each support vector.<br><br>
+        <strong>Why RBF worked best:</strong> Human motion manifolds are locally smooth but globally complex. RBF's infinite-dimensional flexibility captures this better than polynomial (fixed degree) or linear.
+    </div>
+</div>
+
+<div class="viva-box">
+    <div class="viva-q">Q3: "What is Gini Impurity vs Entropy in Decision Trees? Why Gini?"</div>
+    <div class="viva-a">
+        <strong>Gini Impurity:</strong> G = 1 - Σ p<sub>c</sub>². Probability of misclassifying a randomly chosen sample if labeled by class distribution in node.<br>
+        <strong>Entropy:</strong> H = -Σ p<sub>c</sub> log₂ p<sub>c</sub>. Information theory measure of uncertainty.<br><br>
+        <strong>Both lead to similar trees.</strong> Gini is slightly faster to compute (no log). Default in scikit-learn. For our 6-class problem, both work; we used default <code>criterion='gini'</code>.
+    </div>
+</div>
+
+<div class="viva-box">
+    <div class="viva-q">Q4: "Why does Weighted KNN beat standard KNN? Explain the math."</div>
+    <div class="viva-a">
+        <strong>Standard KNN (uniform):</strong> Each of k neighbors gets 1 vote. Prediction = majority class among k neighbors. All neighbors weighted equally regardless of distance.<br><br>
+        <strong>Weighted KNN (distance):</strong> Weight wᵢ = 1 / d(x, xᵢ) (or 1/d²). Closer neighbors contribute more. <br><br>
+        <strong>Why it helps in our data:</strong> Sensor noise creates outliers. In standard KNN, a noisy neighbor at distance 10 counts the same as a clean neighbor at distance 0.1. Weighted KNN suppresses the noisy neighbor's influence by factor of 100×. Result: smoother decision boundaries, higher accuracy (92.4% vs 91.5% for k=5).
+    </div>
+</div>
+
+<div class="viva-box">
+    <div class="viva-q">Q5: "Explain Bagging vs Boosting. Why does Random Forest (Bagging) work better than AdaBoost (Boosting) here?"</div>
+    <div class="viva-a">
+        <strong>Bagging (Bootstrap Aggregating - Random Forest):</strong> Trains N models in PARALLEL on different bootstrap samples (sampling with replacement). Each tree sees different data + different feature subset (max_features). Reduces VARIANCE by averaging decorrelated trees. Very robust to noise/outliers.<br><br>
+        <strong>Boosting (AdaBoost):</strong> Trains models SEQUENTIALLY. Each new model focuses on samples PREVIOUS models got wrong (reweights them). Reduces BIAS but INCREASES sensitivity to outliers/noise. If a noisy sample is misclassified, AdaBoost keeps increasing its weight, forcing later models to overfit it.<br><br>
+        <strong>Why RF (93.8%) > AdaBoost (53.4%):</strong> Our sensor data has noise. AdaBoost obsessively chases noisy outliers, degrading performance. RF's averaging is inherently robust.
+    </div>
+</div>
+
+<div class="viva-box">
+    <div class="viva-q">Q6: "What is the curse of dimensionality? How did PCA solve it for KNN?"</div>
+    <div class="viva-a">
+        <strong>Curse of Dimensionality:</strong> As dimensions increase:<br>
+        1. Volume of space grows exponentially → data becomes extremely sparse.<br>
+        2. All pairwise distances converge → nearest and farthest neighbor become equidistant.<br>
+        3. KNN relies on "nearest" being meaningful. In 561-D, distance concentration makes "nearest" almost random.<br><br>
+        <strong>PCA Solution:</strong> Projects data onto 102 orthogonal components capturing 95% variance. In this lower-dimensional manifold:<br>
+        1. Noise dimensions (with near-zero variance) are discarded.<br>
+        2. Remaining dimensions have meaningful distance relationships.<br>
+        3. KNN distances become discriminative again.
+    </div>
+</div>
+
+<div class="viva-box">
+    <div class="viva-q">Q7: "Your test accuracy is 96.84%. How do you know this isn't overfitting or data leakage?"</div>
+    <div class="viva-a">
+        <strong>No Leakage Evidence:</strong><br>
+        1. <strong>Subject-wise Split:</strong> Train volunteers (1-21) ≠ Test volunteers (22-30). Model never sees test person's gait pattern during training.<br>
+        2. <strong>Strict Preprocessing:</strong> StandardScaler, SelectKBest, PCA all fitted ONLY on training data. Test data only transformed.<br>
+        3. <strong>CV Strategy:</strong> Stratified 5-Fold on training data only. Test set untouched until final evaluation.<br>
+        4. <strong>CV-Test Gap:</strong> CV accuracy (96.5%) ≈ Test accuracy (96.8%). Small positive gap is normal (full training data > 80% CV folds). Large gap (>2-3%) would indicate overfitting/leakage.
+    </div>
+</div>
+
+<div class="viva-box">
+    <div class="viva-q">Q8: "Why did you choose C=10.0 for SVM? What does C control?"</div>
+    <div class="viva-a">
+        <strong>C (Regularization Parameter):</strong> Controls the tradeoff between:<br>
+        - <strong>Low C:</strong> Wider margin, more misclassifications allowed (high bias, low variance).<br>
+        - <strong>High C:</strong> Narrower margin, fewer training errors (low bias, high variance).<br><br>
+        <strong>C=10.0</strong> was selected after testing [0.1, 1, 10, 100] via cross-validation. C=10 gave best CV score. C=100 started overfitting (CV dropped). C=1.0 underfit (margin too wide).
+    </div>
+</div>
+
+<div class="viva-box">
+    <div class="viva-q">Q9: "Explain the difference between cross_val_score and cross_val_predict."</div>
+    <div class="viva-a">
+        <strong>cross_val_score:</strong> Returns array of scores (one per fold). Used for model selection and hyperparameter tuning. Does not return predictions.<br>
+        <strong>cross_val_predict:</strong> Returns predictions for EVERY sample in the dataset, where each sample is predicted by the model that did NOT see it during training (i.e., the fold where it was in validation set). Useful for getting out-of-fold predictions for stacking, plotting confusion matrices per fold, or computing per-sample metrics.<br><br>
+        <strong>We used cross_val_score</strong> for all model comparisons because it's faster (no need to store predictions) and directly gives the metrics we need.
+    </div>
+</div>
+
+<div class="viva-box">
+    <div class="viva-q">Q10: "What is n_jobs=-1? Why use it? Any downsides?"</div>
+    <div class="viva-a">
+        <strong>n_jobs=-1</strong> means "use all available CPU cores". scikit-learn uses <code>joblib</code> for parallelization.<br><br>
+        <strong>Used in:</strong> RandomForest (<code>n_jobs=-1</code> builds trees in parallel), cross_val_score (<code>n_jobs=-1</code> runs folds in parallel), GridSearchCV, etc.<br><br>
+        <strong>Downsides:</strong> (1) Memory usage multiplies (each process copies data). On small RAM, can cause OOM. (2) Slight overhead for small tasks. (3) Not thread-safe with some libraries. <br><br>
+        <strong>We used it</strong> because 5-fold CV × 11 models × 7,352 samples is computationally heavy. Parallelization cut runtime from ~10 minutes to ~2 minutes.
+    </div>
+</div>
+
+<div class="viva-box">
+    <div class="viva-q">Q11: "Why did you use LabelEncoder instead of OneHotEncoder for the target?"</div>
+    <div class="viva-a">
+        <strong>LabelEncoder</strong> maps string labels → integers (0, 1, 2, 3, 4, 5). Used for <strong>target variable (y)</strong> in classification. Classifiers like SVM, RF, KNN natively accept integer labels.<br><br>
+        <strong>OneHotEncoder</strong> creates binary columns for each class. Used for <strong>categorical FEATURES (X)</strong>, not targets. If we one-hot encoded the target, we'd get 6 binary columns — that's for multi-label classification or neural networks with softmax output, not standard scikit-learn classifiers.
+    </div>
+</div>
+
+<div class="viva-box">
+    <div class="viva-q">Q12: "Your confusion matrix shows SITTING and STANDING are most confused. Why? How to fix?"</div>
+    <div class="viva-a">
+        <strong>Reason:</strong> Both are static postures. The smartphone on waist experiences nearly identical gravity vector (1g downward) and near-zero dynamic acceleration. Only subtle differences: hip angle, pressure distribution, micro-movements. In 561-D feature space, their centroids are extremely close.<br><br>
+        <strong>Fixes:</strong> (1) Add more sensors (e.g., thigh-worn accelerometer for thigh angle). (2) Use temporal models (LSTM/TCN) on raw time series — posture transitions reveal differences. (3) Engineer features from gyroscope (body orientation relative to gravity). (4) Ensemble already helps (Soft Voting uses probability nuance).
+    </div>
+</div>
+
+---
+
+<!-- ============================================================
+     MODULE 8: STREAMLIT DEMO CODE EXPLANATION
+============================================================ -->
+<h2>Module 8: Streamlit Demo — Code Walkthrough (<code>src/streamlit_app.py</code>)</h2>
+
+<pre><code><span class="comment"># Path handling — works regardless of where streamlit is launched from</span>
+<span class="keyword">import</span> os
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))      <span class="comment"># /.../AIML-PROJECT/src/</span>
+PROJECT_ROOT = os.path.dirname(CURRENT_DIR)                   <span class="comment"># /.../AIML-PROJECT/</span>
+DATA_PATH = os.path.join(PROJECT_ROOT, <span class="string">'data'</span>, <span class="string">'processed_data.pkl'</span>)
+MODELS_PATH = os.path.join(PROJECT_ROOT, <span class="string">'models'</span>, <span class="string">'final_evaluation_results.pkl'</span>)
+
+<span class="comment"># @st.cache_resource = singleton pattern, runs once per session</span>
+@st.cache_resource
+<span class="keyword">def</span> load_artifacts():
+    <span class="keyword">if</span> <span class="keyword">not</span> os.path.exists(DATA_PATH):
+        <span class="keyword">return</span> <span class="keyword">None</span>, <span class="keyword">None</span>
+    data = joblib.load(DATA_PATH)
+    results = joblib.load(MODELS_PATH) <span class="keyword">if</span> os.path.exists(MODELS_PATH) <span class="keyword">else</span> <span class="keyword">None</span>
+    <span class="keyword">return</span> data, results
+</code></pre>
+
+<div class="viva-box">
+    <div class="viva-q">Viva Q: "Why @st.cache_resource instead of @st.cache_data?"</div>
+    <div class="viva-a"><code>@st.cache_resource</code> is for objects that are expensive to create and should be shared across sessions (ML models, database connections, fitted transformers). <code>@st.cache_data</code> is for serializable data (DataFrames, arrays, JSON). Our fitted models and scalers are unserializable complex objects — must use <code>cache_resource</code>.</div>
+</div>
+
+<pre><code><span class="comment"># Recreate models from saved config (can't pickle fitted SVM easily across versions)</span>
+<span class="keyword">if</span> results <span class="keyword">and</span> <span class="string">'champion_model'</span> <span class="keyword">in</span> results:
+    scaler = results[<span class="string">'scaler'</span>]
+    le = results[<span class="string">'label_encoder'</span>]
+    model = results[<span class="string">'champion_model'</span>]
+    <span class="comment"># But Streamlit re-runs script on every interaction, so we cache the loaded model</span>
+</code></pre>
+
+<pre><code><span class="comment"># Live prediction</span>
+sample_vector = X_test.iloc[sample_idx:sample_idx+1]
+scaled_sample = scaler.transform(sample_vector)
+pred_idx = model.predict(scaled_sample)[0]
+pred_label = le.inverse_transform([pred_idx])[0]
+
+<span class="comment"># Probability chart (if model supports it)</span>
+<span class="keyword">if</span> hasattr(model, <span class="string">'predict_proba'</span>):
+    probs = model.predict_proba(scaled_sample)[0]
+    prob_df = pd.DataFrame({'Activity': le.classes_, 'Confidence': probs}).sort_values('Confidence', ascending=<span class="keyword">False</span>)
+    st.bar_chart(prob_df.set_index('Activity'))
+</code></pre>
+
+---
+
+<footer>
+    PRML Capstone Deep-Dive Guide | Gati Shakti Vishwavidyalaya, Vadodara | Team: Rudransh (25AI1019), Sahitya (25AI1042), Gulshan (25AI1019)<br>
+    GitHub: https://github.com/thisisgulshanshah/prml-human-activity-recognition
+</footer>
+
+</div>
+
+</body>
+</html>

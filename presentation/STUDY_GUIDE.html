@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRML Complete Study Guide & Viva Prep — Human Activity Recognition</title>
+    <style>
+        :root {
+            --primary: #0284c7;
+            --primary-dark: #0369a1;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --bg-card: #f8fafc;
+            --border: #e2e8f0;
+            --accent-green: #16a34a;
+            --accent-orange: #ea580c;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-main);
+            background-color: #f1f5f9;
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .paper {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 60px 70px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
+        }
+
+        .no-print-bar {
+            max-width: 900px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e293b;
+            color: white;
+            padding: 14px 24px;
+            border-radius: 8px;
+        }
+
+        .print-btn {
+            background: #38bdf8;
+            color: #0f172a;
+            border: none;
+            padding: 10px 20px;
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        .print-btn:hover {
+            background: #7dd3fc;
+        }
+
+        header {
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 24px;
+            margin-bottom: 32px;
+        }
+
+        h1 {
+            font-size: 30px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .meta-box {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 16px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .meta-item strong {
+            color: #0f172a;
+        }
+
+        h2 {
+            font-size: 22px;
+            color: #0f172a;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+            margin-top: 36px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        h3 {
+            font-size: 17px;
+            color: var(--primary-dark);
+            margin-top: 20px;
+            margin-bottom: 8px;
+        }
+
+        p {
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+
+        ul, ol {
+            margin-left: 24px;
+            margin-bottom: 16px;
+            font-size: 15px;
+        }
+
+        li {
+            margin-bottom: 6px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0 24px 0;
+            font-size: 14px;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            text-align: left;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #0f172a;
+            font-weight: 700;
+        }
+
+        tr:nth-child(even) td {
+            background: #fbfcfe;
+        }
+
+        .highlight-box {
+            background: #eff6ff;
+            border-left: 4px solid var(--primary);
+            padding: 14px 18px;
+            border-radius: 0 6px 6px 0;
+            margin: 16px 0;
+            font-size: 14.5px;
+        }
+
+        .qa-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .qa-q {
+            font-weight: 700;
+            color: #0f172a;
+            font-size: 15.5px;
+            margin-bottom: 6px;
+        }
+
+        .qa-a {
+            color: #334155;
+            font-size: 14.5px;
+            padding-left: 12px;
+            border-left: 2px solid var(--accent-green);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 4px;
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        footer {
+            margin-top: 48px;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .no-print-bar {
+                display: none;
+            }
+            .paper {
+                border: none;
+                box-shadow: none;
+                padding: 0;
+                max-width: 100%;
+            }
+            .qa-card {
+                page-break-inside: avoid;
+            }
+            table {
+                page-break-inside: avoid;
+            }
+            h2 {
+                page-break-after: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="no-print-bar">
+        <span>📄 PRML Project Study Guide for Team</span>
+        <button class="print-btn" onclick="window.print()">
+            <span>🖨️ Save as PDF / Print</span>
+        </button>
+    </div>
+
+    <div class="paper">
+        <header>
+            <h1>📘 PRML Complete Project Study & Viva Guide</h1>
+            <div class="subtitle">Human Activity Recognition using Smartphone Sensors (UCI HAR)</div>
+            <div class="meta-box">
+                <div class="meta-item">
+                    <strong>Project Team:</strong><br>
+                    • Rudransh Mishra (25AI1019)<br>
+                    • Sahitya Panwar (25AI1042)<br>
+                    • Gulshan Kumar Shah (25AI1019)
+                </div>
+                <div class="meta-item">
+                    <strong>Course Details:</strong><br>
+                    • Course: Pattern Recognition & Machine Learning (PRML)<br>
+                    • Program: B.Tech AI & Data Science | Semester 3<br>
+                    • Institute: Gati Shakti Vishwavidyalaya, Vadodara
+                </div>
+            </div>
+        </header>
+
+        <h2>🌟 1. Project Essence in Plain English</h2>
+        <p>
+            When a user carries a smartphone, the internal <strong>triaxial accelerometer</strong> (detecting acceleration and gravity) and <strong>triaxial gyroscope</strong> (detecting angular velocity) capture motion 50 times each second.
+        </p>
+        <div class="highlight-box">
+            <strong>The Core Problem:</strong> Can an AI system classify human movement into 6 daily activities (Walking, Walking Upstairs, Walking Downstairs, Sitting, Standing, Laying) using only these sensor readings?<br><br>
+            <strong>The Result:</strong> Our pipeline achieves <strong>96.84% accuracy</strong> on 2,947 completely unseen test samples!
+        </div>
+
+        <h2>📊 2. Dataset Anatomy (UCI HAR)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Property</th>
+                    <th>Specification</th>
+                    <th>Significance</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Total Observations</strong></td>
+                    <td>10,299 samples</td>
+                    <td>Sufficient statistical power across all classes</td>
+                </tr>
+                <tr>
+                    <td><strong>Partition Split</strong></td>
+                    <td>7,352 Train (71.4%) / 2,947 Test (28.6%)</td>
+                    <td>Strictly partitioned by subject identity to avoid data leakage</td>
+                </tr>
+                <tr>
+                    <td><strong>Feature Dimensions</strong></td>
+                    <td>561 continuous variables</td>
+                    <td>Time and frequency domain sensor signals</td>
+                </tr>
+                <tr>
+                    <td><strong>Missing Values</strong></td>
+                    <td>0 null entries</td>
+                    <td>Pristine baseline requiring no imputation</td>
+                </tr>
+                <tr>
+                    <td><strong>Normalization</strong></td>
+                    <td>Normalized to [-1.0, +1.0]</td>
+                    <td>Uniform dynamic range across all sensor channels</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>🔬 3. Complete End-to-End ML Pipeline</h2>
+
+        <h3>Stage 1: Exploratory Data Analysis (EDA)</h3>
+        <ul>
+            <li><strong>Class Balance:</strong> Each activity represents 14% to 19% of the dataset (~1,000 to 1,400 samples each), confirming class equilibrium.</li>
+            <li><strong>Static vs Dynamic Separation:</strong> Walking activities generate high kinetic acceleration variance, whereas Sitting, Standing, and Laying are governed almost exclusively by the Earth's gravitational vector.</li>
+            <li><strong>Multicollinearity:</strong> High pairwise correlations (over 100 feature pairs with |r| > 0.90) established the absolute necessity for dimensionality reduction.</li>
+        </ul>
+
+        <h3>Stage 2: Unsupervised Learning (Clustering)</h3>
+        <ul>
+            <li><strong>K-Means Optimization:</strong> We tested $k \in [2, 10]$ without using ground-truth labels. The <strong>Elbow Method</strong> (sum of squared distances) and <strong>Silhouette Score</strong> peaked at exactly $k=6$, proving that the sensor features naturally cluster into the 6 physical activities.</li>
+            <li><strong>Clustering Fidelity:</strong> Adjusted Rand Index (ARI) = <strong>0.448</strong>; Normalized Mutual Information (NMI) = <strong>0.562</strong>.</li>
+            <li><strong>DBSCAN Density Tuning:</strong> Evaluated using a 5-NN sorted distance graph to locate the density knee point ($\varepsilon = 15.0$, `min_samples` = 5), successfully isolating sensor noise from dense activity manifolds.</li>
+        </ul>
+
+        <h3>Stage 3: Dimensionality Reduction (Feature Selection vs PCA)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Configuration</th>
+                    <th>Feature Count</th>
+                    <th>5-Fold CV Accuracy</th>
+                    <th>Bandwidth Reduction</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Full Baseline Space</strong></td>
+                    <td>561 features</td>
+                    <td>96.25%</td>
+                    <td>0% (Full baseline)</td>
+                </tr>
+                <tr>
+                    <td><strong>SelectKBest (ANOVA F-test)</strong></td>
+                    <td>100 features</td>
+                    <td>95.80%</td>
+                    <td><span class="badge">82.2% reduction</span></td>
+                </tr>
+                <tr>
+                    <td><strong>PCA (95% Variance)</strong></td>
+                    <td>102 components</td>
+                    <td>95.40%</td>
+                    <td><span class="badge">81.8% reduction</span></td>
+                </tr>
+            </tbody>
+        </table>
+        <p><em>Key Takeaway: Discarding over 82% of sensor features reduces accuracy by less than 0.5% while accelerating prediction speed by ~5× for low-power mobile hardware.</em></p>
+
+        <h3>Stage 4: Supervised Learning Benchmark</h3>
+        <ul>
+            <li><strong>Gaussian Naive Bayes (78.3%):</strong> Struggled because it assumes conditional independence among features, which is violated by correlated sensor channels.</li>
+            <li><strong>Decision Tree (87.2%):</strong> Prone to variance and orthogonal axis cuts.</li>
+            <li><strong>Weighted KNN (92.4%):</strong> Inversely weights nearest neighbors by Euclidean distance ($1/\text{distance}$), significantly outperforming standard uniform KNN ($k=5$ at 91.5%).</li>
+            <li><strong>Random Forest (93.8%):</strong> Bagging ensemble of 100 decorrelated trees reducing variance.</li>
+            <li><strong>SVM with RBF Kernel (96.54% — Best Individual Model):</strong> The Radial Basis Function kernel projects the continuous curved motion vectors into infinite-dimensional Hilbert space to find the optimal separating hyperplane.</li>
+        </ul>
+
+        <h3>Stage 5: Ensemble Architectures (Hard vs Soft Voting)</h3>
+        <ul>
+            <li><strong>Hard Voting (96.71% Test Accuracy):</strong> Plurality majority voting where each base estimator casts one discrete integer class vote.</li>
+            <li><strong>Soft Voting (96.84% Test Accuracy — CHAMPION 🏆):</strong> Averages the calibrated posterior class probabilities across models. Highly confident predictions override marginal guesses, yielding the highest Macro F1-Score of <strong>96.88%</strong>.</li>
+        </ul>
+
+        <h2>👥 4. Team Presentation Strategy (Slide Allocation)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Presenter</th>
+                    <th>Slides Assigned</th>
+                    <th>Core Responsibility</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Gulshan Kumar Shah</strong></td>
+                    <td>Slides 01 – 04</td>
+                    <td>Problem Statement, Healthcare Motivation, Dataset Profiling, and Unsupervised K-Means/DBSCAN Clustering.</td>
+                </tr>
+                <tr>
+                    <td><strong>Rudransh Mishra</strong></td>
+                    <td>Slides 05 – 08</td>
+                    <td>Stratified 5-Fold Protocol, 5-Stage System Pipeline, Feature Selection vs PCA, and Supervised Classifier Benchmarks.</td>
+                </tr>
+                <tr>
+                    <td><strong>Sahitya Panwar</strong></td>
+                    <td>Slides 09 – 12</td>
+                    <td>Engineering Challenges Overcome, Theoretical PRML Learnings, Live Streamlit Demo, GitHub Assets, and Conclusion.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>❓ 5. Professor's Expected Viva Questions & Model Answers</h2>
+
+        <div class="qa-card">
+            <div class="qa-q">Q1: Why did you choose this dataset over common ones like Iris or Titanic?</div>
+            <div class="qa-a">
+                "Sir, benchmark lab datasets often have fewer than 10 features. The UCI HAR dataset features 561 variables across 10,299 samples, which allowed us to rigorously examine the <strong>Curse of Dimensionality</strong>, evaluate filter selection against PCA compression, and observe how high-dimensional geometry impacts distance-based and kernel methods."
+            </div>
+        </div>
+
+        <div class="qa-card">
+            <div class="qa-q">Q2: Why did SVM with an RBF Kernel outperform Decision Trees and Naive Bayes?</div>
+            <div class="qa-a">
+                "Sir, Naive Bayes assumes independent features, which fails because triaxial sensors are correlated. Decision Trees make axis-parallel rectangular splits that struggle with smooth continuous curves. The SVM RBF kernel projects the 561-D data non-linearly to construct a maximum-margin hyperplane."
+            </div>
+        </div>
+
+        <div class="qa-card">
+            <div class="qa-q">Q3: What is the fundamental difference between Hard and Soft Voting?</div>
+            <div class="qa-a">
+                "Sir, Hard Voting is simple majority rule where each model casts one label vote. Soft Voting averages the predicted class probabilities across all models ($\arg\max \sum P_i(y|x)$). Soft Voting won because a 98% confident prediction by SVM appropriately outweighs split votes from less confident classifiers."
+            </div>
+        </div>
+
+        <div class="qa-card">
+            <div class="qa-q">Q4: How did you determine that k=6 is optimal in K-Means without looking at the labels?</div>
+            <div class="qa-a">
+                "Sir, in Notebook 02, we hid all labels and ran K-Means for $k \in [2, 10]$. Both the <strong>Inertia Elbow bend</strong> and the <strong>Silhouette Score</strong> peaked at $k=6$, proving that the physical sensor signals naturally cluster into 6 distinct biomechanical movement patterns."
+            </div>
+        </div>
+
+        <div class="qa-card">
+            <div class="qa-q">Q5: Why did you use Stratified K-Fold instead of standard K-Fold?</div>
+            <div class="qa-a">
+                "Sir, standard K-Fold splits randomly, which can inadvertently create folds with unequal class representations. Stratified K-Fold ensures that every single fold maintains the identical percentage distribution of all 6 classes, eliminating evaluation bias."
+            </div>
+        </div>
+
+        <div class="qa-card">
+            <div class="qa-q">Q6: Why did PCA require 102 components to capture 95% variance?</div>
+            <div class="qa-a">
+                "Sir, high-frequency sensor streams contain minor noise across multiple axes. The first 102 orthogonal eigenvectors capture 95% of total signal energy while discarding the remaining 459 noisy components, reducing feature bandwidth by ~82% while keeping accuracy at 95.4%."
+            </div>
+        </div>
+
+        <footer>
+            PRML Capstone Project | Gati Shakti Vishwavidyalaya, Vadodara | Academic Year 2026-27<br>
+            GitHub Repository: https://github.com/thisisgulshanshah/prml-human-activity-recognition
+        </footer>
+    </div>
+
+</body>
+</html>

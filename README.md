@@ -1,7 +1,11 @@
 # PRML Project: Human Activity Recognition (HAR)
 
 **Course:** Pattern Recognition & Machine Learning (PRML)  
-**Team:** Gulshan Kumar Shah (B.Tech AI&DS, 3rd Sem, GSV Vadodara)  
+**Team Members:**
+- Rudransh Mishra (25AI1019)
+- Sahitya Panwar (25AI1042)
+- Gulshan Kumar Shah (25AI1019)  
+**Institute:** Gati Shakti Vishwavidyalaya, Vadodara (B.Tech AI&DS, 3rd Sem)  
 **Dataset:** UCI Human Activity Recognition with Smartphones (Kaggle version)
 
 ## 📊 Project Overview

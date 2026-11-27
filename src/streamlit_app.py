@@ -26,7 +26,8 @@ PLOTS_DIR = os.path.join(PROJECT_ROOT, 'presentation')
 
 st.title("🏃 Human Activity Recognition (HAR) — PRML Demo Console")
 st.markdown("### Multiclass Classification & Latent Space Decomposition")
-st.markdown("`Team: Gulshan Kumar Shah` | `Dataset: UCI HAR (10,299 Samples, 561 Features, 6 Classes)`")
+st.markdown("`Team: Rudransh Mishra (25AI1019) | Sahitya Panwar (25AI1042) | Gulshan Kumar Shah (25AI1019)`")
+st.markdown("`Dataset: UCI HAR (10,299 Samples, 561 Features, 6 Classes) | Gati Shakti Vishwavidyalaya`")
 st.markdown("---")
 
 @st.cache_resource
