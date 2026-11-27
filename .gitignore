@@ -1,0 +1,18 @@
+# Large dataset files & pickle objects
+data/
+*.csv
+*.pkl
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store
