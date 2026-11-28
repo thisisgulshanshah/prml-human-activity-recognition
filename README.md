@@ -177,3 +177,10 @@ The pipeline generates:
 Academic project for PRML course.
 
 Logistic Regression evaluation results and plots are generated when the updated notebooks are executed; no new accuracy values are asserted here.
+
+
+### Logistic Regression feature comparison
+
+![Logistic Regression feature comparison](presentation/logistic_regression_feature_comparison.svg)
+
+[Recorded benchmark results](presentation/logistic_regression_results.csv). RFE and updated ensemble evaluation remain pending.
