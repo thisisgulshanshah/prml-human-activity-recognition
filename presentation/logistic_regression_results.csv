@@ -1,0 +1,4 @@
+Approach,CV Accuracy (%),Test Accuracy (%),Macro Precision (%),Macro Recall (%),Macro F1 (%)
+All Features,98.4766,95.5887,95.8647,95.4585,95.5726
+PCA 95%,97.2252,93.0777,93.0944,92.8785,92.9433
+RF top 100,96.5314,93.0438,93.3889,92.8907,93.0287
