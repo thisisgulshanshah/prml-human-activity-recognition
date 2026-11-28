@@ -1,15 +1,9 @@
 Model,Accuracy (%),Precision (%),Recall (%),F1-Score (%)
+Weighted Soft Voting,95.86,95.99,95.69,95.78
 Logistic Regression,95.52,95.81,95.39,95.50
 SVM (RBF Kernel),95.49,95.59,95.31,95.40
-Soft Voting Ensemble,93.82,94.15,93.49,93.65
-Hard Voting Ensemble,92.74,93.12,92.36,92.52
+Weighted Hard Voting,95.08,95.27,94.81,94.94
 Random Forest (100 Trees),92.67,92.76,92.40,92.51
 SVM (Poly Kernel),92.40,92.88,91.91,92.08
 Weighted KNN (k=5),88.43,89.25,87.93,88.13
-KNN (k=5),88.02,88.97,87.46,87.66
-Weighted KNN (k=3),87.61,88.35,87.15,87.34
-KNN (k=3),87.28,88.16,86.78,86.99
 Decision Tree,86.22,86.25,85.87,85.95
-KNN (k=1),85.34,86.02,84.91,85.09
-Gaussian Naive Bayes,77.03,79.25,76.91,76.72
-AdaBoost Classifier,62.98,63.64,62.66,52.18
