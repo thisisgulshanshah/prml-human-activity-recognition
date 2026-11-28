@@ -74,6 +74,8 @@ jupyter notebook notebooks/
 # 1. 01_eda.ipynb
 # 2. 02_clustering.ipynb
 # 3. 03_modeling.ipynb
+# 4. 04_pca_feature_selection.ipynb
+# 5. 05_ensemble_evaluation.ipynb
 ```
 
 ### 4. Launch Demo
@@ -100,6 +102,7 @@ streamlit run src/streamlit_app.py
 | Model | Type |
 |-------|------|
 | Naive Bayes | GaussianNB |
+| Logistic Regression | Multiclass, max_iter=2000 |
 | SVM | RBF & Polynomial kernels |
 | Decision Tree | Gini criterion |
 | KNN | k=1,3,5 + Weighted (distance) |
@@ -107,12 +110,13 @@ streamlit run src/streamlit_app.py
 | AdaBoost | 100 estimators |
 
 #### Feature Selection
-- **SelectKBest** (ANOVA F-value): k=50,100,150,200,300
+- **Random Forest feature importance** (Gini-based): k=50,100,150,200,300
 - **RFE** (Recursive Feature Elimination) with Random Forest
 
 #### PCA
 - 95% variance retention
 - Model comparison on PCA features
+- Logistic Regression comparison across all features, RF top 100, RFE top 100 and PCA, with fold-local preprocessing.
 
 #### Evaluation
 - **Stratified 5-Fold Cross-Validation**
@@ -122,6 +126,7 @@ streamlit run src/streamlit_app.py
 #### Ensembles
 - **Hard Voting:** Majority class voting
 - **Soft Voting:** Average predicted probabilities
+- Both voting ensembles include Logistic Regression alongside the existing estimators.
 
 ## 📊 Expected Results
 
@@ -170,3 +175,5 @@ The pipeline generates:
 ## 📄 License
 
 Academic project for PRML course.
+
+Logistic Regression evaluation results and plots are generated when the updated notebooks are executed; no new accuracy values are asserted here.
